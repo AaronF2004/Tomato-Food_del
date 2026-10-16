@@ -1,0 +1,17 @@
+# Dependencies
+node_modules/
+
+# Environment files with sensitive credentials
+.env
+.env.local
+
+# Build outputs
+dist/
+build/
+
+# Uploaded images
+backend/uploads/
+
+# Log files and OS caches
+*.log
+.DS_Store
