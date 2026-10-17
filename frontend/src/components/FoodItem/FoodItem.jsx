@@ -10,11 +10,17 @@ const FoodItem = ({ id, name, price, description, image }) => {
       <div className="food-item-img-container">
         <img
           className="food-item-image"
-          src={image.startsWith("http") || image.startsWith("/") ? image : `${url}/images/${image}`}
+          src={
+            image && (image.startsWith("http") || image.startsWith("/"))
+              ? image
+              : `${url}/images/${image}`
+          }
           alt={name}
         />
-        {!cartItems[id] ? (
-          <button className="add-btn" onClick={() => addToCart(id)}>+</button>
+        {!cartItems || !cartItems[id] ? (
+          <button className="add-btn" onClick={() => addToCart(id)} title="Add to cart">
+            +
+          </button>
         ) : (
           <div className="food-item-counter">
             <button onClick={() => removeFromCart(id)}>-</button>

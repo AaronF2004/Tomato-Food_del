@@ -6,10 +6,15 @@
   box-sizing: border-box;
   font-family: 'Outfit', sans-serif;
   scroll-behavior: smooth;
+  -webkit-tap-highlight-color: transparent;
 }
 
-body {
+html, body {
   min-height: 100vh;
+  width: 100%;
+  overflow-x: hidden;
+  background-color: #fafafa;
+  color: #262626;
 }
 
 a {
@@ -17,12 +22,34 @@ a {
   color: inherit;
 }
 
+/* Fluid responsive app container */
 .app {
-  width: 80%;
+  width: 82%;
+  max-width: 1280px;
   margin: auto;
+  min-height: calc(100vh - 280px);
+}
+
+/* Responsive adjustments across devices */
+@media (max-width: 1200px) {
+  .app {
+    width: 88%;
+  }
+}
+
+@media (max-width: 900px) {
+  .app {
+    width: 92%;
+  }
+}
+
+@media (max-width: 600px) {
+  .app {
+    width: 94%;
+  }
 }
 
 @keyframes fadeIn {
-  0% { opacity: 0; }
-  100% { opacity: 1; }
+  0% { opacity: 0; transform: translateY(6px); }
+  100% { opacity: 1; transform: translateY(0); }
 }
