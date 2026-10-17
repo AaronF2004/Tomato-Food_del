@@ -10,8 +10,8 @@ const StoreContextProvider = (props) => {
   const [loading, setLoading] = useState(true);
 
   // Active backend URL
-  const url = "http://localhost:4000";
-  // const url = "https://tomato-backend-xfd1.onrender.com";
+  //const url = "http://localhost:4000";
+  const url = "https://tomato-backend-xfd1.onrender.com";
 
   const addToCart = async (itemId) => {
     if (!cartItems[itemId]) {
