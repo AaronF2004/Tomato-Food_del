@@ -6,9 +6,12 @@ export const StoreContext = createContext(null);
 const StoreContextProvider = (props) => {
   const [cartItems, setCartItems] = useState({});
   const [food_list, setFoodList] = useState([]);
-  const [token, setToken] = useState("");
-  //const url = "http://localhost:4000";
-  const url = "https://tomato-backend-xfdl.onrender.com";
+  const [token, setToken] = useState(localStorage.getItem("token") || "");
+  const [loading, setLoading] = useState(true);
+
+  // Active backend URL
+  const url = "http://localhost:4000";
+  // const url = "https://tomato-backend-xfd1.onrender.com";
 
   const addToCart = async (itemId) => {
     if (!cartItems[itemId]) {
@@ -16,9 +19,14 @@ const StoreContextProvider = (props) => {
     } else {
       setCartItems((prev) => ({ ...prev, [itemId]: prev[itemId] + 1 }));
     }
-    if (token) {
+    const activeToken = token || localStorage.getItem("token");
+    if (activeToken) {
       try {
-        await axios.post(`${url}/api/cart/add`, { itemId }, { headers: { token } });
+        await axios.post(
+          `${url}/api/cart/add`,
+          { itemId },
+          { headers: { token: activeToken } }
+        );
       } catch (error) {
         console.error("Error adding item to cart:", error);
       }
@@ -26,10 +34,24 @@ const StoreContextProvider = (props) => {
   };
 
   const removeFromCart = async (itemId) => {
-    setCartItems((prev) => ({ ...prev, [itemId]: prev[itemId] - 1 }));
-    if (token) {
+    setCartItems((prev) => {
+      const updated = { ...prev };
+      if (updated[itemId] > 1) {
+        updated[itemId] -= 1;
+      } else {
+        delete updated[itemId];
+      }
+      return updated;
+    });
+
+    const activeToken = token || localStorage.getItem("token");
+    if (activeToken) {
       try {
-        await axios.post(`${url}/api/cart/remove`, { itemId }, { headers: { token } });
+        await axios.post(
+          `${url}/api/cart/remove`,
+          { itemId },
+          { headers: { token: activeToken } }
+        );
       } catch (error) {
         console.error("Error removing item from cart:", error);
       }
@@ -62,9 +84,13 @@ const StoreContextProvider = (props) => {
 
   const loadCartData = async (userToken) => {
     try {
-      const response = await axios.post(`${url}/api/cart/get`, {}, { headers: { token: userToken } });
+      const response = await axios.post(
+        `${url}/api/cart/get`,
+        {},
+        { headers: { token: userToken } }
+      );
       if (response.data.success) {
-        setCartItems(response.data.cartData);
+        setCartItems(response.data.cartData || {});
       }
     } catch (error) {
       console.error("Error fetching user cart data:", error);
@@ -73,12 +99,14 @@ const StoreContextProvider = (props) => {
 
   useEffect(() => {
     async function loadData() {
+      setLoading(true);
       await fetchFoodList();
       const storedToken = localStorage.getItem("token");
       if (storedToken) {
         setToken(storedToken);
         await loadCartData(storedToken);
       }
+      setLoading(false);
     }
     loadData();
   }, []);
@@ -92,7 +120,8 @@ const StoreContextProvider = (props) => {
     getTotalCartAmount,
     url,
     token,
-    setToken
+    setToken,
+    loading
   };
 
   return (

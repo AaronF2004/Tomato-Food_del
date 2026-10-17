@@ -1,32 +1,185 @@
-.place-order {
-  display: flex;
+.place-order-wrapper {
+  max-width: 1180px;
+  margin: 35px auto 70px;
+  padding: 0 16px;
+  animation: fadeIn 0.35s ease;
+}
+
+.place-order-form {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 36px;
   align-items: start;
-  justify-content: space-between;
-  gap: 50px;
-  margin-top: 100px;
 }
-.place-order-left {
-  width: 100%;
-  max-width: max(30%, 500px);
-}
-.place-order-left .title {
-  font-size: 30px;
-  font-weight: 600;
-  margin-bottom: 50px;
-}
-.place-order-left input {
-  margin-bottom: 15px;
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #c5c5c5;
-  border-radius: 4px;
-  outline-color: tomato;
-}
-.place-order-left .multi-fields {
+
+/* ===================================================
+   LEFT COLUMN: FORM FIELDS
+=================================================== */
+.place-order-left-card {
+  background: #ffffff;
+  border: 1px solid #ededed;
+  border-radius: 14px;
+  padding: 28px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
   display: flex;
-  gap: 10px;
+  flex-direction: column;
+  gap: 18px;
 }
-.place-order-right {
+
+.section-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #1c1c1c;
+  margin-bottom: 6px;
+}
+
+.input-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.input-group label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #696969;
+}
+
+.input-group input {
+  padding: 11px 14px;
+  border: 1px solid #dcdcdc;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #1c1c1c;
+  outline: none;
+  background-color: #fafafa;
+  transition: all 0.2s ease;
+}
+
+.input-group input:focus {
+  border-color: #ff5e43;
+  background-color: #ffffff;
+  box-shadow: 0 0 0 3px rgba(255, 94, 67, 0.12);
+}
+
+.input-group input::placeholder {
+  color: #a8a8a8;
+}
+
+/* ===================================================
+   RIGHT COLUMN: BILLING & PAYMENT
+=================================================== */
+.place-order-right-card {
+  position: sticky;
+  top: 90px;
+}
+
+.summary-box {
+  background: #ffffff;
+  border: 1px solid #ededed;
+  border-radius: 14px;
+  padding: 26px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+}
+
+.summary-box h3 {
+  font-size: 19px;
+  font-weight: 700;
+  color: #1c1c1c;
+  margin-bottom: 18px;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+  color: #555555;
+  margin-bottom: 12px;
+}
+
+.summary-divider {
+  height: 1px;
+  background-color: #eeeeee;
+  margin: 16px 0;
+}
+
+.summary-row.grand-total {
+  font-size: 17px;
+  color: #1c1c1c;
+  margin-bottom: 24px;
+}
+
+/* Proceed to Payment Button with Orange/Tomato styling */
+.proceed-payment-btn {
   width: 100%;
-  max-width: max(40%, 500px);
+  padding: 14px;
+  background: linear-gradient(135deg, #ff5e43 0%, #e23744 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  letter-spacing: 0.3px;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 14px rgba(226, 55, 68, 0.25);
+  display: block;
+  text-align: center;
+}
+
+.proceed-payment-btn:hover {
+  background: linear-gradient(135deg, #ff4c2e 0%, #cb202d 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(226, 55, 68, 0.35);
+}
+
+.proceed-payment-btn:active {
+  transform: translateY(0);
+}
+
+/* ===================================================
+   RESPONSIVE DESIGN (Tablets & Mobile)
+=================================================== */
+@media (max-width: 960px) {
+  .place-order-form {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .place-order-right-card {
+    position: static;
+  }
+}
+
+@media (max-width: 600px) {
+  .place-order-wrapper {
+    margin-top: 15px;
+    padding: 0 10px;
+  }
+
+  .place-order-left-card {
+    padding: 18px;
+    border-radius: 10px;
+  }
+
+  .input-row {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .section-title {
+    font-size: 19px;
+  }
+
+  .summary-box {
+    padding: 18px;
+    border-radius: 10px;
+  }
 }

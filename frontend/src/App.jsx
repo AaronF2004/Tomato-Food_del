@@ -12,14 +12,15 @@ import FloatingCart from "./components/FloatingCart/FloatingCart";
 
 const App = () => {
   const [showLogin, setShowLogin] = useState(false);
+  const [search, setSearch] = useState("");
 
   return (
     <>
       {showLogin && <LoginPopup setShowLogin={setShowLogin} />}
       <div className="app">
-        <Navbar setShowLogin={setShowLogin} />
+        <Navbar setShowLogin={setShowLogin} search={search} setSearch={setSearch} />
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<Home search={search} />} />
           <Route path="/cart" element={<Cart setShowLogin={setShowLogin} />} />
           <Route path="/order" element={<PlaceOrder />} />
           <Route path="/verify" element={<Verify />} />

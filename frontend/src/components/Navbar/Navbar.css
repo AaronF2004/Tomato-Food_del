@@ -1,165 +1,319 @@
-.navbar {
-  padding: 18px 0px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.navbar-container {
   position: sticky;
   top: 0;
-  background-color: #fafafa;
-  z-index: 20;
+  z-index: 100;
+  background-color: #ffffff;
+  border-bottom: 1px solid #f0f0f0;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
 }
 
-.navbar .logo {
-  width: 140px;
-  display: block;
+.navbar-wrapper {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
 }
 
-.navbar-menu {
+.navbar-logo {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: var(--primary, #e23744);
+  display: flex;
+  align-items: baseline;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+.navbar-logo .logo-dot {
+  color: #1c1c1c;
+  font-size: 30px;
+}
+
+/* Simplified Clean Search Bar */
+.zomato-search-bar {
+  flex: 1;
+  max-width: 580px;
+  display: flex;
+  align-items: center;
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(28, 28, 28, 0.05);
+  padding: 8px 14px;
+  gap: 10px;
+  transition: all 0.2s ease;
+}
+
+.zomato-search-bar:focus-within {
+  border-color: #bdbdbd;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+}
+
+.search-glass {
+  font-size: 15px;
+  opacity: 0.65;
+  flex-shrink: 0;
+}
+
+.zomato-search-bar input {
+  border: none;
+  outline: none;
+  width: 100%;
+  font-size: 14px;
+  color: #1c1c1c;
+  background: transparent;
+}
+
+.zomato-search-bar input::placeholder {
+  color: #8c8c8c;
+}
+
+.search-clear {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  color: #888;
+  padding: 2px 6px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.search-clear:hover {
+  color: #1c1c1c;
+}
+
+/* Actions */
+.navbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-shrink: 0;
+}
+
+.navbar-nav-links {
   display: flex;
   list-style: none;
-  gap: 24px;
-  color: #49557e;
-  font-size: 17px;
-  font-weight: 500;
+  gap: 20px;
 }
 
-.navbar-menu li, .navbar-menu a {
-  cursor: pointer;
-  color: inherit;
+.navbar-nav-links a {
+  font-size: 15px;
+  font-weight: 500;
+  color: #4f4f4f;
   transition: color 0.2s ease;
 }
 
-.navbar-menu li:hover, .navbar-menu a:hover {
-  color: tomato;
+.navbar-nav-links a:hover,
+.navbar-nav-links a.active {
+  color: var(--primary, #e23744);
 }
 
-.navbar-menu .active {
-  padding-bottom: 2px;
-  border-bottom: 2px solid tomato;
-  color: tomato;
-}
-
-.navbar-right {
+.navbar-cart-btn {
+  color: #1c1c1c;
   display: flex;
   align-items: center;
-  gap: 26px;
+  position: relative;
+  transition: color 0.2s;
 }
 
-.navbar-search-icon {
+.navbar-cart-btn:hover {
+  color: var(--primary, #e23744);
+}
+
+.cart-icon-wrapper {
   position: relative;
   display: flex;
   align-items: center;
 }
 
-.navbar-search-icon .basket-icon {
-  width: 26px;
-  height: 26px;
-  cursor: pointer;
-  transition: transform 0.2s ease;
-}
-
-.navbar-search-icon .basket-icon:hover {
-  transform: scale(1.1);
-}
-
-.navbar-search-icon .dot {
+.cart-badge-dot {
   position: absolute;
-  min-width: 9px;
-  min-height: 9px;
-  background-color: tomato;
+  top: -2px;
+  right: -2px;
+  width: 9px;
+  height: 9px;
+  background-color: var(--primary, #e23744);
+  border: 2px solid #ffffff;
   border-radius: 50%;
-  top: -3px;
-  right: -3px;
 }
 
-.navbar button {
+.auth-buttons {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.btn-signin {
+  border: none;
   background: transparent;
-  font-size: 15px;
-  color: #49557e;
-  border: 1px solid tomato;
-  padding: 8px 24px;
-  border-radius: 50px;
-  cursor: pointer;
-  transition: all 0.3s ease;
+  font-size: 14px;
   font-weight: 500;
+  color: #4f4f4f;
+  cursor: pointer;
+  padding: 6px 10px;
+  transition: color 0.2s;
 }
 
-.navbar button:hover {
-  background-color: tomato;
+.btn-signin:hover {
+  color: #1c1c1c;
+}
+
+.btn-signup {
+  background: var(--primary, #e23744);
   color: white;
+  border: none;
+  padding: 7px 16px;
+  font-size: 13.5px;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-.navbar-profile {
+.btn-signup:hover {
+  background: var(--primary-hover, #cb202d);
+  transform: translateY(-1px);
+}
+
+/* User Avatar & Dropdown */
+.user-profile-menu {
   position: relative;
   cursor: pointer;
 }
 
-.navbar-profile img {
-  width: 26px;
-  height: 26px;
+.user-avatar-badge {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #fff0f1;
+  border: 1.5px solid rgba(226, 55, 68, 0.25);
+  display: grid;
+  place-items: center;
+  font-size: 16px;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.user-profile-menu:hover .user-avatar-badge {
+  box-shadow: 0 0 0 3px rgba(226, 55, 68, 0.15);
+}
+
+.standard-dropdown {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 10px);
+  background: #ffffff;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  border: 1px solid #f0f0f0;
+  border-radius: 12px;
+  padding: 8px;
+  min-width: 160px;
+  z-index: 200;
+  display: none;
+  animation: fadeIn 0.2s ease;
+}
+
+.user-profile-menu:hover .standard-dropdown,
+.standard-dropdown.open {
   display: block;
 }
 
-.nav-profile-dropdown {
-  position: absolute;
-  display: none;
-  right: 0;
-  top: 100%;
-  z-index: 30;
-  margin-top: 8px;
-}
-
-.navbar-profile:hover .nav-profile-dropdown {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  background-color: #fff9f8;
-  padding: 12px 20px;
-  border-radius: 8px;
-  border: 1px solid #ffdcd6;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-  list-style: none;
-  width: 130px;
-}
-
-.nav-profile-dropdown li {
+.dropdown-item {
   display: flex;
   align-items: center;
-  gap: 10px;
-  cursor: pointer;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 8px;
   font-size: 14px;
+  font-weight: 500;
+  color: #333333;
+  transition: all 0.15s ease;
 }
 
-.nav-profile-dropdown li:hover p {
-  color: tomato;
+.dropdown-item:hover {
+  background-color: #fff4f4;
+  color: var(--primary, #e23744);
 }
 
-.nav-profile-dropdown hr {
-  border: none;
+.dropdown-icon {
+  width: 18px !important;
+  height: 18px !important;
+  max-width: 18px !important;
+  max-height: 18px !important;
+  object-fit: contain;
+  flex-shrink: 0;
+  display: block;
+}
+
+.dropdown-divider {
   height: 1px;
-  background-color: #f0f0f0;
+  background-color: #f2f2f2;
+  margin: 4px 6px;
 }
 
-/* Tablet & Mobile Breakpoints */
+/* ===================================================
+   RESPONSIVE DESIGN (Fixes Mobile Search Placement)
+=================================================== */
+
+/* Tablet Screens */
 @media (max-width: 900px) {
-  .navbar-menu {
-    gap: 16px;
+  .navbar-nav-links {
+    display: none;
+  }
+}
+
+/* Mobile Screens (Under 680px) */
+@media (max-width: 680px) {
+  .navbar-wrapper {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto auto;
+    row-gap: 10px;
+    column-gap: 10px;
+    padding: 10px 16px;
+  }
+
+  /* Row 1, Left: Brand Logo */
+  .navbar-logo {
+    grid-column: 1 / 2;
+    grid-row: 1 / 2;
+    font-size: 24px;
+    align-self: center;
+  }
+
+  /* Row 1, Right: Cart & Account Icons (Always stays top-right) */
+  .navbar-actions {
+    grid-column: 2 / 3;
+    grid-row: 1 / 2;
+    align-self: center;
+    gap: 14px;
+  }
+
+  /* Row 2: Search Bar spans full 100% width cleanly below */
+  .zomato-search-bar {
+    grid-column: 1 / -1;
+    grid-row: 2 / 3;
+    width: 100%;
+    max-width: 100%;
+    margin-top: 2px;
+    padding: 7px 12px;
+  }
+
+  .user-avatar-badge {
+    width: 34px;
+    height: 34px;
     font-size: 15px;
   }
-  .navbar-right {
-    gap: 18px;
-  }
-  .navbar .logo {
-    width: 120px;
-  }
-}
 
-@media (max-width: 680px) {
-  .navbar-menu {
-    display: none; /* Keeps header clean on compact phones */
-  }
-  .navbar button {
-    padding: 7px 18px;
-    font-size: 14px;
+  .standard-dropdown {
+    right: 0;
   }
 }

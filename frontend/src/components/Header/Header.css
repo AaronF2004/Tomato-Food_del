@@ -1,68 +1,92 @@
-.header {
-  height: 34vw;
-  margin: 30px auto;
-  background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1200&auto=format&fit=crop') no-repeat center;
-  background-size: cover;
+.zomato-hero {
   position: relative;
-  border-radius: 15px;
+  border-radius: 16px;
+  margin: 24px auto 35px;
+  padding: 48px 40px;
+  background: linear-gradient(135deg, rgba(28, 28, 28, 0.85) 0%, rgba(28, 28, 28, 0.65) 100%),
+    url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1400&auto=format&fit=crop') center/cover no-repeat;
+  color: #ffffff;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
 }
 
-.header-contents {
-  position: absolute;
+.hero-content {
+  max-width: 600px;
   display: flex;
   flex-direction: column;
-  align-items: start;
-  gap: 1.5vw;
-  max-width: 50%;
-  bottom: 10%;
-  left: 6vw;
-  animation: fadeIn 2s;
+  gap: 16px;
+  animation: fadeIn 0.6s ease;
 }
 
-.header-contents h2 {
+.hero-badge {
+  display: inline-block;
+  align-self: flex-start;
+  background: rgba(226, 55, 68, 0.9);
+  color: #fff;
+  font-size: 12px;
   font-weight: 600;
-  color: white;
-  font-size: max(4.5vw, 22px);
-}
-
-.header-contents p {
-  color: white;
-  font-size: 1vw;
-}
-
-.header-contents button {
-  border: none;
-  color: #747474;
-  font-weight: 500;
-  padding: 1vw 2.3vw;
-  background-color: white;
-  font-size: max(1vw, 13px);
+  padding: 5px 14px;
   border-radius: 50px;
-  cursor: pointer;
-  transition: all 0.3s ease;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
 }
 
-.header-contents button:hover {
-  background-color: #fff4f2;
-  color: tomato;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+.hero-content h1 {
+  font-size: 40px;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.5px;
 }
 
-@media (max-width: 1050px) {
-  .header-contents {
-    max-width: 45%;
-  }
+.hero-content p {
+  font-size: 15px;
+  line-height: 1.6;
+  color: #e0e0e0;
+  max-width: 520px;
 }
 
-@media (max-width: 750px) {
-  .header-contents {
-    max-width: 65%;
+.hero-stats {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-top: 14px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.stat-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-num {
+  font-size: 20px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.stat-txt {
+  font-size: 12px;
+  color: #bdbdbd;
+}
+
+.stat-divider {
+  width: 1px;
+  height: 28px;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+@media (max-width: 768px) {
+  .zomato-hero {
+    padding: 32px 20px;
   }
-  .header-contents p {
-    display: none;
+  .hero-content h1 {
+    font-size: 28px;
   }
-  .header-contents button {
-    padding: 2vw 4vw;
+  .hero-content p {
+    font-size: 13.5px;
+  }
+  .hero-stats {
+    gap: 14px;
   }
 }

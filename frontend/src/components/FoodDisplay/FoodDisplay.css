@@ -1,48 +1,163 @@
-.food-display {
-  margin-top: 40px;
-  margin-bottom: 60px;
+.zomato-food-display {
+  margin: 30px 0 60px 0;
 }
 
-.food-display h2 {
-  font-size: max(2vw, 24px);
+.display-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 22px;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.display-header-row h2 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1c1c1c;
+}
+
+.results-count {
+  font-size: 13px;
+  color: #828282;
+  margin-top: 2px;
+}
+
+/* Zomato Quick Filter Pills */
+.filter-pills-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.filter-pill {
+  background: #ffffff;
+  border: 1px solid #dcdcdc;
+  color: #4f4f4f;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.filter-pill:hover {
+  background: #f7f7f7;
+  border-color: #a8a8a8;
+}
+
+.filter-pill.active {
+  background: #f0fdf4;
+  border-color: #24963f;
+  color: #24963f;
   font-weight: 600;
-  color: #262626;
-  margin-bottom: 25px;
 }
 
-/* Responsive grid layout */
-.food-display-list {
+.filter-pill.active-non-veg {
+  background: #fff0f1;
+  border-color: #e23744;
+  color: #e23744;
+  font-weight: 600;
+}
+
+.filter-select {
+  outline: none;
+}
+
+.veg-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #24963f;
+}
+
+.non-veg-dot {
+  width: 0;
+  height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-bottom: 7px solid #e23744;
+}
+
+/* ===================================================
+   RESPONSIVE DISH GRID (PC, Tablet, Mobile)
+=================================================== */
+.food-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 28px;
-  row-gap: 40px;
+  gap: 24px;
+  row-gap: 30px;
 }
 
-/* Tablet Screens (3 columns) */
-@media (max-width: 1100px) {
-  .food-display-list {
+.no-results-box {
+  background: #ffffff;
+  border: 1px dashed #cfcfcf;
+  border-radius: 14px;
+  text-align: center;
+  padding: 60px 20px;
+  margin-top: 20px;
+}
+
+.no-results-icon {
+  font-size: 46px;
+  display: block;
+  margin-bottom: 10px;
+}
+
+.no-results-box h3 {
+  font-size: 19px;
+  color: #1c1c1c;
+  margin-bottom: 6px;
+}
+
+.no-results-box p {
+  font-size: 13.5px;
+  color: #828282;
+}
+
+/* Laptops / Small Desktops (3 columns) */
+@media (max-width: 1080px) {
+  .food-grid {
     grid-template-columns: repeat(3, 1fr);
-    gap: 22px;
-    row-gap: 32px;
+    gap: 20px;
+    row-gap: 26px;
   }
 }
 
-/* Small Tablets / Phablets (2 columns) */
+/* Tablets (2 columns) */
 @media (max-width: 768px) {
-  .food-display-list {
+  .display-header-row h2 {
+    font-size: 20px;
+  }
+  .food-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 16px;
-    row-gap: 24px;
+    row-gap: 22px;
   }
-  .food-display h2 {
-    font-size: 22px;
+  .filter-pills-row {
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+  .filter-pill {
+    flex-shrink: 0;
   }
 }
 
 /* Mobile Screens (1 column, full-width card) */
 @media (max-width: 480px) {
-  .food-display-list {
+  .food-grid {
     grid-template-columns: 1fr;
-    gap: 18px;
+    gap: 16px;
+  }
+  .display-header-row {
+    flex-direction: column;
+    align-items: flex-start;
   }
 }
