@@ -9,6 +9,7 @@ const PlaceOrder = ({ setShowLogin }) => {
   const { getTotalCartAmount, token, food_list, cartItems, url, loading } =
     useContext(StoreContext);
   const navigate = useNavigate();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [data, setData] = useState({
     firstName: "",
@@ -22,17 +23,13 @@ const PlaceOrder = ({ setShowLogin }) => {
     phone: ""
   });
 
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
-
   const onChangeHandler = (event) => {
     const { name, value } = event.target;
 
-    // Restrict phone number to numbers only and max 10 digits
+    // Strict 10-digit numeric constraint for mobile input
     if (name === "phone") {
-      const numericValue = value.replace(/\D/g, "").slice(0, 10);
-      setData((prev) => ({ ...prev, [name]: numericValue }));
+      const numericVal = value.replace(/\D/g, "").slice(0, 10);
+      setData((prev) => ({ ...prev, [name]: numericVal }));
       return;
     }
 
@@ -63,42 +60,54 @@ const PlaceOrder = ({ setShowLogin }) => {
       }
     });
 
-    let orderData = {
+    if (orderItems.length === 0) {
+      alert("Your cart is empty.");
+      navigate("/cart", { replace: true });
+      return;
+    }
+
+    const orderData = {
       address: data,
       items: orderItems,
       amount: getTotalCartAmount() + 2
     };
 
     try {
-      let response = await axios.post(`${url}/api/order/place`, orderData, {
+      setIsSubmitting(true);
+      const response = await axios.post(`${url}/api/order/place`, orderData, {
         headers: { token: activeToken }
       });
+
       if (response.data.success) {
         const { session_url } = response.data;
-        window.location.replace(session_url);
+        // Direct transfer to Stripe secure session
+        window.location.href = session_url;
       } else {
-        alert("Error placing order: " + response.data.message);
+        setIsSubmitting(false);
+        alert(response.data.message || "Failed to create order");
       }
     } catch (error) {
-      console.error("Order placement failed:", error);
-      alert("Failed to connect to checkout session.");
+      setIsSubmitting(false);
+      console.error("Order placement network error:", error);
+      alert("Unable to reach checkout server. Please try again.");
     }
   };
 
+  // Route guarding: protect against empty cart or unauthenticated direct URL visits
   useEffect(() => {
     if (!loading) {
       const activeToken = token || localStorage.getItem("token");
       if (!activeToken) {
-        navigate("/cart");
+        navigate("/cart", { replace: true });
         if (setShowLogin) setShowLogin("Login");
       } else if (getTotalCartAmount() === 0) {
-        navigate("/cart");
+        navigate("/cart", { replace: true });
       }
     }
-  }, [loading, token]);
+  }, [loading, token, navigate]);
 
   if (loading) {
-    return <Loader text="Preparing your checkout details..." />;
+    return <Loader text="Preparing checkout details..." />;
   }
 
   const subtotal = getTotalCartAmount();
@@ -247,8 +256,12 @@ const PlaceOrder = ({ setShowLogin }) => {
               <b>${grandTotal}.00</b>
             </div>
 
-            <button type="submit" className="proceed-payment-btn">
-              PROCEED TO PAYMENT
+            <button
+              type="submit"
+              className="proceed-payment-btn"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "PROCESSING..." : "PROCEED TO PAYMENT"}
             </button>
           </div>
         </div>

@@ -1,18 +1,21 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext } from "react";
 import "./Cart.css";
 import { StoreContext } from "../../context/StoreContext";
 import Loader from "../../components/Loader/Loader";
 import { useNavigate } from "react-router-dom";
 
 const Cart = ({ setShowLogin }) => {
-  const { cartItems, food_list, addToCart, removeFromCart, getTotalCartAmount, url, token, loading } =
-    useContext(StoreContext);
+  const {
+    cartItems,
+    food_list,
+    addToCart,
+    removeFromCart,
+    getTotalCartAmount,
+    url,
+    token,
+    loading
+  } = useContext(StoreContext);
   const navigate = useNavigate();
-
-  // Ensure view starts from the top
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
 
   if (loading) {
     return <Loader text="Loading your saved cart items..." />;
@@ -32,6 +35,12 @@ const Cart = ({ setShowLogin }) => {
       }
       return;
     }
+
+    if (totalAmount === 0) {
+      alert("Your cart is empty. Please add items before proceeding.");
+      return;
+    }
+
     navigate("/order");
   };
 
