@@ -36,7 +36,7 @@
 /* Simplified Clean Search Bar */
 .zomato-search-bar {
   flex: 1;
-  max-width: 580px;
+  max-width: 540px;
   display: flex;
   align-items: center;
   background: #ffffff;
@@ -183,10 +183,25 @@
   transform: translateY(-1px);
 }
 
-/* User Avatar & Dropdown */
+/* ===================================================
+   USER PROFILE TRIGGER & DROPDOWN WITH ACCOUNT NAME
+=================================================== */
 .user-profile-menu {
   position: relative;
   cursor: pointer;
+}
+
+.user-profile-trigger {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px 4px 4px;
+  border-radius: 24px;
+  transition: background-color 0.2s ease;
+}
+
+.user-profile-trigger:hover {
+  background-color: #f7f7f7;
 }
 
 .user-avatar-badge {
@@ -198,12 +213,23 @@
   display: grid;
   place-items: center;
   font-size: 16px;
-  transition: all 0.2s ease;
   user-select: none;
+  flex-shrink: 0;
 }
 
-.user-profile-menu:hover .user-avatar-badge {
-  box-shadow: 0 0 0 3px rgba(226, 55, 68, 0.15);
+.navbar-user-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #2d2d2d;
+  max-width: 110px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.user-caret {
+  font-size: 11px;
+  color: #777777;
 }
 
 .standard-dropdown {
@@ -215,7 +241,7 @@
   border: 1px solid #f0f0f0;
   border-radius: 12px;
   padding: 8px;
-  min-width: 160px;
+  min-width: 180px;
   z-index: 200;
   display: none;
   animation: fadeIn 0.2s ease;
@@ -226,11 +252,29 @@
   display: block;
 }
 
+/* Header inside dropdown */
+.dropdown-user-header {
+  padding: 8px 12px 6px;
+}
+
+.greeting-label {
+  font-size: 11.5px;
+  color: #8c8c8c;
+  font-weight: 500;
+}
+
+.account-name-label {
+  font-size: 14.5px;
+  font-weight: 700;
+  color: #1c1c1c;
+  word-break: break-word;
+}
+
 .dropdown-item {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 10px 14px;
+  padding: 10px 12px;
   border-radius: 8px;
   font-size: 14px;
   font-weight: 500;
@@ -260,17 +304,14 @@
 }
 
 /* ===================================================
-   RESPONSIVE DESIGN (Fixes Mobile Search Placement)
+   RESPONSIVE DESIGN (Tablets & Mobile)
 =================================================== */
-
-/* Tablet Screens */
 @media (max-width: 900px) {
   .navbar-nav-links {
     display: none;
   }
 }
 
-/* Mobile Screens (Under 680px) */
 @media (max-width: 680px) {
   .navbar-wrapper {
     display: grid;
@@ -281,7 +322,6 @@
     padding: 10px 16px;
   }
 
-  /* Row 1, Left: Brand Logo */
   .navbar-logo {
     grid-column: 1 / 2;
     grid-row: 1 / 2;
@@ -289,15 +329,21 @@
     align-self: center;
   }
 
-  /* Row 1, Right: Cart & Account Icons (Always stays top-right) */
   .navbar-actions {
     grid-column: 2 / 3;
     grid-row: 1 / 2;
     align-self: center;
-    gap: 14px;
+    gap: 12px;
   }
 
-  /* Row 2: Search Bar spans full 100% width cleanly below */
+  .navbar-user-name {
+    display: none; /* Keeps mobile header clean */
+  }
+
+  .user-caret {
+    display: none;
+  }
+
   .zomato-search-bar {
     grid-column: 1 / -1;
     grid-row: 2 / 3;

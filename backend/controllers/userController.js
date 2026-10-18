@@ -22,7 +22,7 @@ export const loginUser = async (req, res) => {
     }
 
     const token = createToken(user._id);
-    res.json({ success: true, token });
+    res.json({ success: true, token, userName: user.name });
   } catch (error) {
     console.log(error);
     res.json({ success: false, message: "Login Error" });
@@ -43,7 +43,10 @@ export const registerUser = async (req, res) => {
     }
 
     if (password.length < 8) {
-      return res.json({ success: false, message: "Please enter a strong password (min 8 characters)" });
+      return res.json({
+        success: false,
+        message: "Please enter a strong password (min 8 characters)"
+      });
     }
 
     const salt = await bcrypt.genSalt(10);
@@ -57,9 +60,23 @@ export const registerUser = async (req, res) => {
 
     const user = await newUser.save();
     const token = createToken(user._id);
-    res.json({ success: true, token });
+    res.json({ success: true, token, userName: user.name });
   } catch (error) {
     console.log(error);
     res.json({ success: false, message: "Registration Error" });
+  }
+};
+
+// Get current user profile name
+export const getUserProfile = async (req, res) => {
+  try {
+    const user = await userModel.findById(req.body.userId);
+    if (!user) {
+      return res.json({ success: false, message: "User not found" });
+    }
+    res.json({ success: true, userName: user.name });
+  } catch (error) {
+    console.log(error);
+    res.json({ success: false, message: "Error fetching user profile" });
   }
 };

@@ -1,13 +1,18 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import "./Cart.css";
 import { StoreContext } from "../../context/StoreContext";
 import Loader from "../../components/Loader/Loader";
 import { useNavigate } from "react-router-dom";
 
-const Cart = () => {
-  const { cartItems, food_list, addToCart, removeFromCart, getTotalCartAmount, url, loading } =
+const Cart = ({ setShowLogin }) => {
+  const { cartItems, food_list, addToCart, removeFromCart, getTotalCartAmount, url, token, loading } =
     useContext(StoreContext);
   const navigate = useNavigate();
+
+  // Ensure view starts from the top
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   if (loading) {
     return <Loader text="Loading your saved cart items..." />;
@@ -18,6 +23,17 @@ const Cart = () => {
   const grandTotal = totalAmount === 0 ? 0 : totalAmount + deliveryFee;
 
   const cartProducts = food_list.filter((item) => cartItems[item._id] > 0);
+
+  const handleProceedToCheckout = () => {
+    const activeToken = token || localStorage.getItem("token");
+    if (!activeToken) {
+      if (setShowLogin) {
+        setShowLogin("Login");
+      }
+      return;
+    }
+    navigate("/order");
+  };
 
   if (cartProducts.length === 0) {
     return (
@@ -122,7 +138,7 @@ const Cart = () => {
 
           <button
             className="checkout-proceed-btn"
-            onClick={() => navigate("/order")}
+            onClick={handleProceedToCheckout}
           >
             PROCEED TO CHECKOUT
           </button>

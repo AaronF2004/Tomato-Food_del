@@ -7,11 +7,12 @@ const StoreContextProvider = (props) => {
   const [cartItems, setCartItems] = useState({});
   const [food_list, setFoodList] = useState([]);
   const [token, setToken] = useState(localStorage.getItem("token") || "");
+  const [userName, setUserName] = useState(localStorage.getItem("userName") || "");
   const [loading, setLoading] = useState(true);
 
   // Active backend URL
-  //const url = "http://localhost:4000";
   const url = "https://tomato-backend-xfdl.onrender.com";
+  //const url = "http://localhost:4000";
 
   const addToCart = async (itemId) => {
     if (!cartItems[itemId]) {
@@ -97,6 +98,23 @@ const StoreContextProvider = (props) => {
     }
   };
 
+  // Fetch actual username from database using token
+  const loadUserProfile = async (userToken) => {
+    try {
+      const response = await axios.post(
+        `${url}/api/user/profile`,
+        {},
+        { headers: { token: userToken } }
+      );
+      if (response.data.success && response.data.userName) {
+        setUserName(response.data.userName);
+        localStorage.setItem("userName", response.data.userName);
+      }
+    } catch (error) {
+      console.error("Error fetching user profile:", error);
+    }
+  };
+
   useEffect(() => {
     async function loadData() {
       setLoading(true);
@@ -104,7 +122,10 @@ const StoreContextProvider = (props) => {
       const storedToken = localStorage.getItem("token");
       if (storedToken) {
         setToken(storedToken);
-        await loadCartData(storedToken);
+        await Promise.all([
+          loadCartData(storedToken),
+          loadUserProfile(storedToken)
+        ]);
       }
       setLoading(false);
     }
@@ -121,6 +142,8 @@ const StoreContextProvider = (props) => {
     url,
     token,
     setToken,
+    userName,
+    setUserName,
     loading
   };
 

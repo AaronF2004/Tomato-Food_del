@@ -7,18 +7,20 @@ import { StoreContext } from "../../context/StoreContext";
 const Navbar = ({ setShowLogin, search = "", setSearch = () => {} }) => {
   const [menu, setMenu] = useState("home");
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const { getTotalCartAmount, token, setToken } = useContext(StoreContext);
+  const { getTotalCartAmount, token, setToken, userName, setUserName } =
+    useContext(StoreContext);
   const navigate = useNavigate();
   const dropdownRef = useRef(null);
 
   const logout = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("userName");
     setToken("");
+    setUserName("");
     setDropdownOpen(false);
     navigate("/");
   };
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -29,6 +31,8 @@ const Navbar = ({ setShowLogin, search = "", setSearch = () => {} }) => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  const displayName = userName || localStorage.getItem("userName") || "User";
+
   return (
     <nav className="navbar-container">
       <div className="navbar-wrapper">
@@ -38,12 +42,12 @@ const Navbar = ({ setShowLogin, search = "", setSearch = () => {} }) => {
           <span className="logo-dot">.</span>
         </Link>
 
-        {/* Simplified Zomato Search Bar (Location Removed) */}
+        {/* Search Bar */}
         <div className="zomato-search-bar">
           <span className="search-glass">🔍</span>
           <input
             type="text"
-            placeholder="Search for cuisine or a dish..."
+            placeholder="Search for restaurant, cuisine or a dish..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
@@ -59,7 +63,7 @@ const Navbar = ({ setShowLogin, search = "", setSearch = () => {} }) => {
           )}
         </div>
 
-        {/* Navigation & Action Controls */}
+        {/* Navigation Links & Actions */}
         <div className="navbar-actions">
           <ul className="navbar-nav-links">
             <li>
@@ -103,13 +107,13 @@ const Navbar = ({ setShowLogin, search = "", setSearch = () => {} }) => {
             </div>
           </Link>
 
-          {/* Auth State & Standardized Dropdown */}
+          {/* Auth State & Dropdown */}
           {!token ? (
             <div className="auth-buttons">
-              <button className="btn-signin" onClick={() => setShowLogin(true)}>
+              <button className="btn-signin" onClick={() => setShowLogin("Login")}>
                 Log in
               </button>
-              <button className="btn-signup" onClick={() => setShowLogin(true)}>
+              <button className="btn-signup" onClick={() => setShowLogin("Sign Up")}>
                 Sign up
               </button>
             </div>
@@ -119,11 +123,21 @@ const Navbar = ({ setShowLogin, search = "", setSearch = () => {} }) => {
               ref={dropdownRef}
               onClick={() => setDropdownOpen((prev) => !prev)}
             >
-              <div className="user-avatar-badge" title="Account">
-                <span>👤</span>
+              <div className="user-profile-trigger">
+                <div className="user-avatar-badge" title={displayName}>
+                  <span>👤</span>
+                </div>
+                <span className="navbar-user-name">{displayName}</span>
+                <span className="user-caret">▾</span>
               </div>
 
               <div className={`standard-dropdown ${dropdownOpen ? "open" : ""}`}>
+                <div className="dropdown-user-header">
+                  <p className="greeting-label">Hello,</p>
+                  <p className="account-name-label">{displayName}</p>
+                </div>
+                <div className="dropdown-divider"></div>
+
                 <div
                   className="dropdown-item"
                   onClick={() => {
@@ -135,6 +149,7 @@ const Navbar = ({ setShowLogin, search = "", setSearch = () => {} }) => {
                   <span>Orders</span>
                 </div>
                 <div className="dropdown-divider"></div>
+
                 <div className="dropdown-item logout-item" onClick={logout}>
                   <img src={assets.logout_icon} alt="Logout" className="dropdown-icon" />
                   <span>Logout</span>

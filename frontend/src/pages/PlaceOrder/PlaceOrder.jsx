@@ -5,7 +5,7 @@ import Loader from "../../components/Loader/Loader";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-const PlaceOrder = () => {
+const PlaceOrder = ({ setShowLogin }) => {
   const { getTotalCartAmount, token, food_list, cartItems, url, loading } =
     useContext(StoreContext);
   const navigate = useNavigate();
@@ -22,14 +22,37 @@ const PlaceOrder = () => {
     phone: ""
   });
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   const onChangeHandler = (event) => {
-    const name = event.target.name;
-    const value = event.target.value;
+    const { name, value } = event.target;
+
+    // Restrict phone number to numbers only and max 10 digits
+    if (name === "phone") {
+      const numericValue = value.replace(/\D/g, "").slice(0, 10);
+      setData((prev) => ({ ...prev, [name]: numericValue }));
+      return;
+    }
+
     setData((prev) => ({ ...prev, [name]: value }));
   };
 
   const placeOrder = async (event) => {
     event.preventDefault();
+
+    const activeToken = token || localStorage.getItem("token");
+    if (!activeToken) {
+      if (setShowLogin) setShowLogin("Login");
+      return;
+    }
+
+    if (data.phone.length !== 10) {
+      alert("Please enter a valid 10-digit phone number.");
+      return;
+    }
+
     let orderItems = [];
     food_list.forEach((item) => {
       if (cartItems[item._id] > 0) {
@@ -48,7 +71,7 @@ const PlaceOrder = () => {
 
     try {
       let response = await axios.post(`${url}/api/order/place`, orderData, {
-        headers: { token: token || localStorage.getItem("token") }
+        headers: { token: activeToken }
       });
       if (response.data.success) {
         const { session_url } = response.data;
@@ -62,11 +85,13 @@ const PlaceOrder = () => {
     }
   };
 
-  // Safe redirect on refresh: Wait until loading is false
   useEffect(() => {
     if (!loading) {
       const activeToken = token || localStorage.getItem("token");
-      if (!activeToken || getTotalCartAmount() === 0) {
+      if (!activeToken) {
+        navigate("/cart");
+        if (setShowLogin) setShowLogin("Login");
+      } else if (getTotalCartAmount() === 0) {
         navigate("/cart");
       }
     }
@@ -186,14 +211,17 @@ const PlaceOrder = () => {
           </div>
 
           <div className="input-group">
-            <label>Phone Number</label>
+            <label>Phone Number (10 Digits)</label>
             <input
               required
               name="phone"
               onChange={onChangeHandler}
               value={data.phone}
               type="tel"
-              placeholder="Phone number"
+              maxLength={10}
+              placeholder="10-digit mobile number"
+              pattern="[0-9]{10}"
+              title="Please enter exactly 10 digits"
             />
           </div>
         </div>
