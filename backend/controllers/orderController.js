@@ -4,9 +4,13 @@ import Stripe from "stripe";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-// Placing User Order from Frontend
+// Placing user order from frontend
 export const placeOrder = async (req, res) => {
-  const frontend_url = "http://localhost:5173";
+  // Determine frontend URL: fallback to your live Vercel domain if on mobile/production
+  const clientOrigin =
+    req.headers.origin ||
+    process.env.FRONTEND_URL ||
+    "https://tomato-food-frontend.vercel.app";
 
   try {
     const newOrder = new orderModel({
@@ -20,18 +24,22 @@ export const placeOrder = async (req, res) => {
 
     const line_items = req.body.items.map((item) => ({
       price_data: {
-        currency: "inr",
-        product_data: { name: item.name },
-        unit_amount: item.price * 100 * 80
+        currency: "usd",
+        product_data: {
+          name: item.name
+        },
+        unit_amount: item.price * 100
       },
       quantity: item.quantity
     }));
 
     line_items.push({
       price_data: {
-        currency: "inr",
-        product_data: { name: "Delivery Charges" },
-        unit_amount: 2 * 100 * 80
+        currency: "usd",
+        product_data: {
+          name: "Delivery Charges"
+        },
+        unit_amount: 2 * 100
       },
       quantity: 1
     });
@@ -39,22 +47,22 @@ export const placeOrder = async (req, res) => {
     const session = await stripe.checkout.sessions.create({
       line_items: line_items,
       mode: "payment",
-      success_url: `${frontend_url}/verify?success=true&orderId=${newOrder._id}`,
-      cancel_url: `${frontend_url}/verify?success=false&orderId=${newOrder._id}`
+      success_url: `${clientOrigin}/verify?success=true&orderId=${newOrder._id}`,
+      cancel_url: `${clientOrigin}/verify?success=false&orderId=${newOrder._id}`
     });
 
     res.json({ success: true, session_url: session.url });
   } catch (error) {
-    console.log(error);
-    res.json({ success: false, message: "Error placing order" });
+    console.error("Order creation failed:", error);
+    res.json({ success: false, message: "Error initiating checkout session" });
   }
 };
 
-// Verifying Order Payment
+// Verifying order payment
 export const verifyOrder = async (req, res) => {
   const { orderId, success } = req.body;
   try {
-    if (success === "true") {
+    if (success === "true" || success === true) {
       await orderModel.findByIdAndUpdate(orderId, { payment: true });
       res.json({ success: true, message: "Paid" });
     } else {
@@ -62,40 +70,42 @@ export const verifyOrder = async (req, res) => {
       res.json({ success: false, message: "Not Paid" });
     }
   } catch (error) {
-    console.log(error);
-    res.json({ success: false, message: "Error verifying order" });
+    console.error("Payment verification failed:", error);
+    res.json({ success: false, message: "Verification error" });
   }
 };
 
-// User Orders for Frontend
+// User orders for frontend
 export const userOrders = async (req, res) => {
   try {
     const orders = await orderModel.find({ userId: req.body.userId });
     res.json({ success: true, data: orders });
   } catch (error) {
-    console.log(error);
-    res.json({ success: false, message: "Error fetching user orders" });
+    console.error("Fetch user orders failed:", error);
+    res.json({ success: false, message: "Error" });
   }
 };
 
-// Listing Orders for Admin Panel
+// Listing orders for admin panel
 export const listOrders = async (req, res) => {
   try {
     const orders = await orderModel.find({});
     res.json({ success: true, data: orders });
   } catch (error) {
-    console.log(error);
-    res.json({ success: false, message: "Error fetching all orders" });
+    console.error("List orders failed:", error);
+    res.json({ success: false, message: "Error" });
   }
 };
 
-// API for updating order status
+// Updating order status for admin
 export const updateStatus = async (req, res) => {
   try {
-    await orderModel.findByIdAndUpdate(req.body.orderId, { status: req.body.status });
+    await orderModel.findByIdAndUpdate(req.body.orderId, {
+      status: req.body.status
+    });
     res.json({ success: true, message: "Status Updated" });
   } catch (error) {
-    console.log(error);
-    res.json({ success: false, message: "Error updating status" });
+    console.error("Update status failed:", error);
+    res.json({ success: false, message: "Error" });
   }
 };
