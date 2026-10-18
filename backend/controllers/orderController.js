@@ -6,18 +6,16 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 // Placing user order from frontend
 export const placeOrder = async (req, res) => {
-  // Determine frontend URL: fallback to your live Vercel domain if on mobile/production
-  const clientOrigin =
-    req.headers.origin ||
-    process.env.FRONTEND_URL ||
-    "https://tomato-food-frontend.vercel.app";
+  // Use exact frontend URL
+  const frontend_url =
+    process.env.FRONTEND_URL || "https://tomato-food-frontend.vercel.app";
 
   try {
     const newOrder = new orderModel({
       userId: req.body.userId,
       items: req.body.items,
       amount: req.body.amount,
-      address: req.body.address
+      address: req.body.address,
     });
     await newOrder.save();
     await userModel.findByIdAndUpdate(req.body.userId, { cartData: {} });
@@ -26,29 +24,29 @@ export const placeOrder = async (req, res) => {
       price_data: {
         currency: "usd",
         product_data: {
-          name: item.name
+          name: item.name,
         },
-        unit_amount: item.price * 100
+        unit_amount: item.price * 100,
       },
-      quantity: item.quantity
+      quantity: item.quantity,
     }));
 
     line_items.push({
       price_data: {
         currency: "usd",
         product_data: {
-          name: "Delivery Charges"
+          name: "Delivery Charges",
         },
-        unit_amount: 2 * 100
+        unit_amount: 2 * 100,
       },
-      quantity: 1
+      quantity: 1,
     });
 
     const session = await stripe.checkout.sessions.create({
       line_items: line_items,
       mode: "payment",
-      success_url: `${clientOrigin}/verify?success=true&orderId=${newOrder._id}`,
-      cancel_url: `${clientOrigin}/verify?success=false&orderId=${newOrder._id}`
+      success_url: `${frontend_url}/verify?success=true&orderId=${newOrder._id}`,
+      cancel_url: `${frontend_url}/verify?success=false&orderId=${newOrder._id}`,
     });
 
     res.json({ success: true, session_url: session.url });
@@ -101,7 +99,7 @@ export const listOrders = async (req, res) => {
 export const updateStatus = async (req, res) => {
   try {
     await orderModel.findByIdAndUpdate(req.body.orderId, {
-      status: req.body.status
+      status: req.body.status,
     });
     res.json({ success: true, message: "Status Updated" });
   } catch (error) {
