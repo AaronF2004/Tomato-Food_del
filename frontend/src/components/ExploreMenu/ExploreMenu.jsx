@@ -4,39 +4,53 @@ import { menu_list } from "../../assets/assets";
 
 const ExploreMenu = ({ category, setCategory }) => {
   return (
-    <div className="zomato-explore" id="explore-menu">
-      <div className="explore-header">
+    <section className="explore-menu-section" id="explore-menu">
+      <div className="explore-menu-header">
         <h2>Inspiration for your first order</h2>
-        <p>Explore our most popular cuisines & quick bites</p>
+        <p>Explore top culinary delights hand-crafted by master chefs</p>
       </div>
 
-      <div className="explore-categories">
-        {/* All Filter Card */}
+      <div className="explore-menu-scroll">
+        {/* All Dishes Option */}
         <div
-          className={`explore-pill ${category === "All" ? "selected" : ""}`}
           onClick={() => setCategory("All")}
+          className="explore-menu-item"
         >
-          <div className="pill-avatar all-avatar">🍽️</div>
-          <span className="pill-name">All Foods</span>
+          <div className={`explore-menu-avatar-box ${category === "All" ? "active-ring" : ""}`}>
+            <span className="all-icon">🍽️</span>
+          </div>
+          <span className={`explore-menu-label ${category === "All" ? "active-text" : ""}`}>
+            All
+          </span>
         </div>
 
-        {menu_list.map((item, index) => {
-          const isSelected = category === item.menu_name;
-          return (
+        {/* Categories */}
+        {menu_list.map((item, index) => (
+          <div
+            key={index}
+            onClick={() =>
+              setCategory((prev) => (prev === item.menu_name ? "All" : item.menu_name))
+            }
+            className="explore-menu-item"
+          >
             <div
-              key={index}
-              className={`explore-pill ${isSelected ? "selected" : ""}`}
-              onClick={() => setCategory((prev) => (prev === item.menu_name ? "All" : item.menu_name))}
+              className={`explore-menu-avatar-box ${
+                category === item.menu_name ? "active-ring" : ""
+              }`}
             >
-              <div className="pill-avatar">
-                <img src={item.menu_image} alt={item.menu_name} />
-              </div>
-              <span className="pill-name">{item.menu_name}</span>
+              <img src={item.menu_image} alt={item.menu_name} />
             </div>
-          );
-        })}
+            <span
+              className={`explore-menu-label ${
+                category === item.menu_name ? "active-text" : ""
+              }`}
+            >
+              {item.menu_name}
+            </span>
+          </div>
+        ))}
       </div>
-    </div>
+    </section>
   );
 };
 

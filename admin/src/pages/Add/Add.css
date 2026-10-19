@@ -1,51 +1,51 @@
 .add {
-  width: 70%;
-  margin-left: max(5vw, 25px);
-  margin-top: 50px;
-  color: #6d6d6d;
-  font-size: 16px;
+ width: 70%;
+ margin-left: max(5vw, 25px);
+ margin-top: 50px;
+ color: #6d6d6d;
+ font-size: 16px;
 }
 .add form {
-  gap: 20px;
+ gap: 20px;
 }
 .upload-preview {
-  width: 120px;
-  height: 80px;
-  border: 1px dashed #6d6d6d;
-  display: grid;
-  place-items: center;
-  cursor: pointer;
-  border-radius: 4px;
+ width: 120px;
+ height: 80px;
+ border: 1px dashed #6d6d6d;
+ display: grid;
+ place-items: center;
+ cursor: pointer;
+ border-radius: 4px;
 }
 .upload-preview img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+ width: 100%;
+ height: 100%;
+ object-fit: cover;
 }
 .add-product-name, .add-product-description {
-  width: max(40%, 280px);
+ width: max(40%, 280px);
 }
 .add-product-name input, .add-product-description textarea {
-  padding: 10px;
-  border: 1px solid #a9a9a9;
-  border-radius: 4px;
+ padding: 10px;
+ border: 1px solid #a9a9a9;
+ border-radius: 4px;
 }
 .add-category-price {
-  display: flex;
-  gap: 30px;
+ display: flex;
+ gap: 30px;
 }
 .add-category-price select, .add-category-price input {
-  max-width: 120px;
-  padding: 10px;
-  border: 1px solid #a9a9a9;
-  border-radius: 4px;
+ max-width: 120px;
+ padding: 10px;
+ border: 1px solid #a9a9a9;
+ border-radius: 4px;
 }
 .add-btn {
-  max-width: 120px;
-  border: none;
-  padding: 10px;
-  background-color: black;
-  color: white;
-  cursor: pointer;
-  border-radius: 4px;
-}
+ max-width: 120px;
+ border: none;
+ padding: 10px;
+ background-color: black;
+ color: white;
+ cursor: pointer;
+ border-radius: 4px;
+}                                                                   

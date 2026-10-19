@@ -1,105 +1,94 @@
-.zomato-explore {
-  margin: 28px 0 20px 0;
+.explore-menu-section {
+  margin: 36px 0 24px 0;
 }
 
-.explore-header h2 {
-  font-size: 22px;
+.explore-menu-header h2 {
+  font-size: 24px;
   font-weight: 700;
   color: #1c1c1c;
+  letter-spacing: -0.3px;
 }
 
-.explore-header p {
-  font-size: 13px;
-  color: #828282;
-  margin-top: 3px;
+.explore-menu-header p {
+  font-size: 13.5px;
+  color: #757575;
+  margin-top: 4px;
 }
 
-.explore-categories {
+.explore-menu-scroll {
   display: flex;
   align-items: center;
-  gap: 22px;
-  margin-top: 20px;
+  gap: 26px;
+  margin-top: 24px;
   overflow-x: auto;
-  padding: 4px 2px 14px 2px;
-  scrollbar-width: thin;
-  -webkit-overflow-scrolling: touch;
+  padding: 8px 4px 16px 4px;
+  scrollbar-width: none;
 }
 
-.explore-categories::-webkit-scrollbar {
-  height: 4px;
-}
-.explore-categories::-webkit-scrollbar-thumb {
-  background: #e0e0e0;
-  border-radius: 4px;
+.explore-menu-scroll::-webkit-scrollbar {
+  display: none;
 }
 
-.explore-pill {
+.explore-menu-item {
   display: flex;
   flex-direction: column;
   align-items: center;
   cursor: pointer;
   flex-shrink: 0;
-  gap: 8px;
   transition: transform 0.2s ease;
-  user-select: none;
 }
 
-.explore-pill:hover {
+.explore-menu-item:hover {
   transform: translateY(-2px);
 }
 
-.pill-avatar {
-  width: 86px;
-  height: 86px;
+.explore-menu-avatar-box {
+  width: 82px;
+  height: 82px;
   border-radius: 50%;
   overflow: hidden;
+  background-color: #f7f7f7;
+  display: grid;
+  place-items: center;
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
-  border: 3px solid transparent;
+  border: 2px solid transparent;
   transition: all 0.2s ease;
 }
 
-.pill-avatar img {
+.explore-menu-avatar-box img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-.all-avatar {
-  background: #fff0f1;
-  display: grid;
-  place-items: center;
+.all-icon {
   font-size: 32px;
 }
 
-.explore-pill.selected .pill-avatar {
-  border-color: var(--primary, #e23744);
-  box-shadow: 0 4px 12px rgba(226, 55, 68, 0.3);
+.explore-menu-avatar-box.active-ring {
+  border-color: #e23744;
+  box-shadow: 0 0 0 3px rgba(226, 55, 68, 0.2);
 }
 
-.pill-name {
-  font-size: 13.5px;
-  font-weight: 600;
-  color: #363636;
+.explore-menu-label {
+  margin-top: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #4f4f4f;
   text-align: center;
 }
 
-.explore-pill.selected .pill-name {
-  color: var(--primary, #e23744);
+.explore-menu-label.active-text {
+  color: #e23744;
   font-weight: 700;
 }
 
 @media (max-width: 600px) {
-  .pill-avatar {
-    width: 72px;
-    height: 72px;
+  .explore-menu-avatar-box {
+    width: 68px;
+    height: 68px;
   }
-  .all-avatar {
-    font-size: 26px;
-  }
-  .pill-name {
-    font-size: 12px;
-  }
-  .explore-categories {
-    gap: 16px;
+  .explore-menu-label {
+    font-size: 12.5px;
   }
 }

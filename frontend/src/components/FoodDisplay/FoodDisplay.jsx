@@ -2,119 +2,137 @@ import React, { useContext, useState, useMemo } from "react";
 import "./FoodDisplay.css";
 import { StoreContext } from "../../context/StoreContext";
 import FoodItem from "../FoodItem/FoodItem";
-import Loader from "../Loader/Loader";
 
-const FoodDisplay = ({ category, setCategory, search = "" }) => {
-  const { food_list, loading } = useContext(StoreContext);
+const FoodDisplay = ({ category }) => {
+  const { food_list, searchQuery, setSearchQuery } = useContext(StoreContext);
+
+  // Filter & Sort state
   const [dietFilter, setDietFilter] = useState("all"); // 'all' | 'veg' | 'non-veg'
-  const [sortBy, setSortBy] = useState("default");
-  const [minRating, setMinRating] = useState(false);
-
-  const nonVegKeywords = ["chicken", "mutton", "fish", "prawn", "egg", "kebab", "meat", "wings", "shawarma"];
-
-  const checkIsNonVeg = (item) => {
-    return (
-      item.category === "Non Veg" ||
-      nonVegKeywords.some((kw) => item.name?.toLowerCase().includes(kw))
-    );
-  };
-
-  const handleDietToggle = (type) => {
-    if (dietFilter === type) {
-      setDietFilter("all");
-    } else {
-      setDietFilter(type);
-      if (type === "veg" && category === "Non Veg" && setCategory) {
-        setCategory("All");
-      } else if (type === "non-veg" && category === "Pure Veg" && setCategory) {
-        setCategory("All");
-      }
-    }
-  };
+  const [ratingFilter, setRatingFilter] = useState(false);
+  const [sortBy, setSortBy] = useState("popularity"); // 'popularity' | 'price-low' | 'price-high'
 
   const filteredDishes = useMemo(() => {
-    return food_list
-      .filter((item) => {
-        const matchCategory = category === "All" || item.category === category;
+    let result = food_list.filter((item) => {
+      // 1. Search Query Filter (name, description, or category match)
+      if (searchQuery.trim() !== "") {
+        const query = searchQuery.toLowerCase().trim();
+        const matchesName = item.name?.toLowerCase().includes(query);
+        const matchesDesc = item.description?.toLowerCase().includes(query);
+        const matchesCat = item.category?.toLowerCase().includes(query);
 
-        const matchSearch =
-          !search ||
-          item.name.toLowerCase().includes(search.toLowerCase()) ||
-          item.category.toLowerCase().includes(search.toLowerCase()) ||
-          item.description.toLowerCase().includes(search.toLowerCase());
+        if (!matchesName && !matchesDesc && !matchesCat) {
+          return false;
+        }
+      }
 
-        const isNonVeg = checkIsNonVeg(item);
-        let matchDiet = true;
-        if (dietFilter === "veg") matchDiet = !isNonVeg;
-        if (dietFilter === "non-veg") matchDiet = isNonVeg;
+      // 2. Category Carousel Filter
+      if (category !== "All" && item.category !== category) {
+        return false;
+      }
 
-        return matchCategory && matchSearch && matchDiet;
-      })
-      .sort((a, b) => {
-        if (sortBy === "price-low") return a.price - b.price;
-        if (sortBy === "price-high") return b.price - a.price;
-        return 0;
-      });
-  }, [food_list, category, search, dietFilter, sortBy]);
+      const isVeg = item.category === "Pure Veg" || item.category === "Salad";
+
+      // 3. Veg / Non-Veg Pills
+      if (dietFilter === "veg" && !isVeg) return false;
+      if (dietFilter === "non-veg" && isVeg) return false;
+
+      // 4. Rating 4.0+ Pill
+      if (ratingFilter) {
+        const rating = item.rating || 4.5;
+        if (rating < 4.0) return false;
+      }
+
+      return true;
+    });
+
+    // Sort Order
+    if (sortBy === "price-low") {
+      result.sort((a, b) => a.price - b.price);
+    } else if (sortBy === "price-high") {
+      result.sort((a, b) => b.price - a.price);
+    }
+
+    return result;
+  }, [food_list, category, dietFilter, ratingFilter, sortBy, searchQuery]);
 
   return (
-    <div className="zomato-food-display" id="food-display">
-      <div className="display-header-row">
+    <div className="food-display" id="food-display">
+      <div className="food-display-header-wrap">
         <div>
-          <h2>Delivery Restaurants & Dishes</h2>
-          <p className="results-count">
-            {loading ? "Searching dishes..." : `Showing ${filteredDishes.length} dishes`}
-          </p>
+          <h2>
+            {searchQuery
+              ? `Search Results for "${searchQuery}"`
+              : "Delivery Restaurants & Dishes"}
+          </h2>
+          <p className="food-display-count">Showing {filteredDishes.length} dishes</p>
         </div>
 
-        {/* Zomato quick filter pills */}
-        <div className="filter-pills-row">
+        {/* Filter Pills Bar */}
+        <div className="food-filters-bar">
           <button
+            type="button"
             className={`filter-pill ${dietFilter === "veg" ? "active" : ""}`}
-            onClick={() => handleDietToggle("veg")}
+            onClick={() => setDietFilter((prev) => (prev === "veg" ? "all" : "veg"))}
           >
-            <span className="dot veg-dot"></span> Pure Veg
+            <span className="pill-dot veg-dot"></span>
+            Pure Veg
           </button>
 
           <button
-            className={`filter-pill ${dietFilter === "non-veg" ? "active-non-veg" : ""}`}
-            onClick={() => handleDietToggle("non-veg")}
+            type="button"
+            className={`filter-pill ${dietFilter === "non-veg" ? "active" : ""}`}
+            onClick={() => setDietFilter((prev) => (prev === "non-veg" ? "all" : "non-veg"))}
           >
-            <span className="dot non-veg-dot"></span> Non-Veg
+            <span className="pill-dot non-veg-dot"></span>
+            Non-Veg
           </button>
 
           <button
-            className={`filter-pill ${minRating ? "active" : ""}`}
-            onClick={() => setMinRating(!minRating)}
+            type="button"
+            className={`filter-pill ${ratingFilter ? "active" : ""}`}
+            onClick={() => setRatingFilter((prev) => !prev)}
           >
             ★ Rating 4.0+
           </button>
 
-          <select
-            className="filter-pill filter-select"
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value)}
-          >
-            <option value="default">Sort by: Popularity</option>
-            <option value="price-low">Cost: Low to High</option>
-            <option value="price-high">Cost: High to Low</option>
-          </select>
+          <div className="sort-dropdown-wrap">
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="sort-dropdown-select"
+            >
+              <option value="popularity">Sort by: Popularity</option>
+              <option value="price-low">Sort by: Price (Low to High)</option>
+              <option value="price-high">Sort by: Price (High to Low)</option>
+            </select>
+          </div>
         </div>
       </div>
 
-      {loading ? (
-        <Loader text="Finding delicious meals near you..." />
-      ) : filteredDishes.length === 0 ? (
-        <div className="no-results-box">
-          <span className="no-results-icon">🍲</span>
-          <h3>No matching dishes found</h3>
-          <p>Click "All Foods" or deselect conflicting dietary filters to see available items.</p>
+      {filteredDishes.length === 0 ? (
+        <div className="no-dishes-found">
+          <p>
+            {searchQuery
+              ? `No dishes found matching "${searchQuery}".`
+              : "No dishes found matching the selected filters."}
+          </p>
+          <button
+            type="button"
+            onClick={() => {
+              setSearchQuery("");
+              setDietFilter("all");
+              setRatingFilter(false);
+              setSortBy("popularity");
+            }}
+          >
+            Reset Search & Filters
+          </button>
         </div>
       ) : (
-        <div className="food-grid">
-          {filteredDishes.map((item) => (
+        <div className="food-display-list">
+          {filteredDishes.map((item, index) => (
             <FoodItem
-              key={item._id}
+              key={index}
               id={item._id}
               name={item.name}
               description={item.description}

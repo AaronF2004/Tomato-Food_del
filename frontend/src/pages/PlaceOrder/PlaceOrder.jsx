@@ -1,15 +1,14 @@
 import React, { useContext, useEffect, useState } from "react";
 import "./PlaceOrder.css";
 import { StoreContext } from "../../context/StoreContext";
-import Loader from "../../components/Loader/Loader";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const PlaceOrder = ({ setShowLogin }) => {
-  const { getTotalCartAmount, token, food_list, cartItems, url, loading } =
-    useContext(StoreContext);
+  const { getTotalCartAmount, token, food_list, cartItems, url } = useContext(StoreContext);
   const navigate = useNavigate();
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const [data, setData] = useState({
     firstName: "",
@@ -23,13 +22,20 @@ const PlaceOrder = ({ setShowLogin }) => {
     phone: ""
   });
 
+  // Ensure scroll lands at the top
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   const onChangeHandler = (event) => {
     const { name, value } = event.target;
 
-    // Strict 10-digit numeric constraint for mobile input
+    // Strict 10-digit number enforcement for phone
     if (name === "phone") {
-      const numericVal = value.replace(/\D/g, "").slice(0, 10);
-      setData((prev) => ({ ...prev, [name]: numericVal }));
+      const sanitized = value.replace(/\D/g, ""); // Accept digits only
+      if (sanitized.length <= 10) {
+        setData((prev) => ({ ...prev, phone: sanitized }));
+      }
       return;
     }
 
@@ -39,18 +45,21 @@ const PlaceOrder = ({ setShowLogin }) => {
   const placeOrder = async (event) => {
     event.preventDefault();
 
-    const activeToken = token || localStorage.getItem("token");
-    if (!activeToken) {
-      if (setShowLogin) setShowLogin("Login");
+    if (!token) {
+      toast.warn("Please sign in to complete your order.");
+      setShowLogin(true);
       return;
     }
 
+    // Explicit 10-digit validation check
     if (data.phone.length !== 10) {
-      alert("Please enter a valid 10-digit phone number.");
+      toast.error("Please enter a valid 10-digit mobile number.");
       return;
     }
 
-    let orderItems = [];
+    setLoading(true);
+
+    const orderItems = [];
     food_list.forEach((item) => {
       if (cartItems[item._id] > 0) {
         orderItems.push({
@@ -60,12 +69,6 @@ const PlaceOrder = ({ setShowLogin }) => {
       }
     });
 
-    if (orderItems.length === 0) {
-      alert("Your cart is empty.");
-      navigate("/cart", { replace: true });
-      return;
-    }
-
     const orderData = {
       address: data,
       items: orderItems,
@@ -73,55 +76,47 @@ const PlaceOrder = ({ setShowLogin }) => {
     };
 
     try {
-      setIsSubmitting(true);
       const response = await axios.post(`${url}/api/order/place`, orderData, {
-        headers: { token: activeToken }
+        headers: { token }
       });
 
       if (response.data.success) {
         const { session_url } = response.data;
-        // Direct transfer to Stripe secure session
-        window.location.href = session_url;
+        window.location.replace(session_url);
       } else {
-        setIsSubmitting(false);
-        alert(response.data.message || "Failed to create order");
+        toast.error(response.data.message || "Failed to initiate payment.");
       }
     } catch (error) {
-      setIsSubmitting(false);
-      console.error("Order placement network error:", error);
-      alert("Unable to reach checkout server. Please try again.");
+      toast.error("Unable to place order at this time. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
-  // Route guarding: protect against empty cart or unauthenticated direct URL visits
   useEffect(() => {
-    if (!loading) {
-      const activeToken = token || localStorage.getItem("token");
-      if (!activeToken) {
-        navigate("/cart", { replace: true });
-        if (setShowLogin) setShowLogin("Login");
-      } else if (getTotalCartAmount() === 0) {
-        navigate("/cart", { replace: true });
-      }
+    if (!token) {
+      toast.info("Please sign in to access checkout.");
+      setShowLogin(true);
+      navigate("/cart");
+    } else if (getTotalCartAmount() === 0) {
+      toast.warn("Your cart is empty.");
+      navigate("/cart");
     }
-  }, [loading, token, navigate]);
-
-  if (loading) {
-    return <Loader text="Preparing checkout details..." />;
-  }
+  }, [token]);
 
   const subtotal = getTotalCartAmount();
   const deliveryFee = subtotal === 0 ? 0 : 2;
-  const grandTotal = subtotal === 0 ? 0 : subtotal + deliveryFee;
+  const total = subtotal + deliveryFee;
 
   return (
-    <div className="place-order-wrapper">
-      <form onSubmit={placeOrder} className="place-order-form">
-        <div className="place-order-left-card">
-          <h2 className="section-title">Delivery Information</h2>
+    <div className="place-order-page">
+      <form onSubmit={placeOrder} className="place-order-container">
+        {/* Left: Form Fields (Image 3) */}
+        <div className="delivery-info-card">
+          <h2>Delivery Information</h2>
 
-          <div className="input-row">
-            <div className="input-group">
+          <div className="input-row-two">
+            <div className="form-field-group">
               <label>First Name</label>
               <input
                 required
@@ -132,7 +127,7 @@ const PlaceOrder = ({ setShowLogin }) => {
                 placeholder="First name"
               />
             </div>
-            <div className="input-group">
+            <div className="form-field-group">
               <label>Last Name</label>
               <input
                 required
@@ -145,7 +140,7 @@ const PlaceOrder = ({ setShowLogin }) => {
             </div>
           </div>
 
-          <div className="input-group">
+          <div className="form-field-group">
             <label>Email Address</label>
             <input
               required
@@ -157,7 +152,7 @@ const PlaceOrder = ({ setShowLogin }) => {
             />
           </div>
 
-          <div className="input-group">
+          <div className="form-field-group">
             <label>Street Address</label>
             <input
               required
@@ -169,8 +164,8 @@ const PlaceOrder = ({ setShowLogin }) => {
             />
           </div>
 
-          <div className="input-row">
-            <div className="input-group">
+          <div className="input-row-two">
+            <div className="form-field-group">
               <label>City</label>
               <input
                 required
@@ -181,7 +176,7 @@ const PlaceOrder = ({ setShowLogin }) => {
                 placeholder="City"
               />
             </div>
-            <div className="input-group">
+            <div className="form-field-group">
               <label>State</label>
               <input
                 required
@@ -194,8 +189,8 @@ const PlaceOrder = ({ setShowLogin }) => {
             </div>
           </div>
 
-          <div className="input-row">
-            <div className="input-group">
+          <div className="input-row-two">
+            <div className="form-field-group">
               <label>Zip Code</label>
               <input
                 required
@@ -206,7 +201,7 @@ const PlaceOrder = ({ setShowLogin }) => {
                 placeholder="Zip code"
               />
             </div>
-            <div className="input-group">
+            <div className="form-field-group">
               <label>Country</label>
               <input
                 required
@@ -219,7 +214,7 @@ const PlaceOrder = ({ setShowLogin }) => {
             </div>
           </div>
 
-          <div className="input-group">
+          <div className="form-field-group">
             <label>Phone Number (10 Digits)</label>
             <input
               required
@@ -235,8 +230,9 @@ const PlaceOrder = ({ setShowLogin }) => {
           </div>
         </div>
 
-        <div className="place-order-right-card">
-          <div className="summary-box">
+        {/* Right: Cart Totals Card (Image 3) */}
+        <div className="place-order-sidebar">
+          <div className="checkout-summary-card">
             <h3>Cart Totals</h3>
 
             <div className="summary-row">
@@ -249,19 +245,19 @@ const PlaceOrder = ({ setShowLogin }) => {
               <span>${deliveryFee}.00</span>
             </div>
 
-            <div className="summary-divider"></div>
+            <hr className="summary-divider" />
 
-            <div className="summary-row grand-total">
-              <b>Total</b>
-              <b>${grandTotal}.00</b>
+            <div className="summary-row total-highlight">
+              <span>Total</span>
+              <span>${total}.00</span>
             </div>
 
             <button
               type="submit"
-              className="proceed-payment-btn"
-              disabled={isSubmitting}
+              className="confirm-payment-btn"
+              disabled={loading}
             >
-              {isSubmitting ? "PROCESSING..." : "PROCEED TO PAYMENT"}
+              {loading ? "PROCESSING..." : "PROCEED TO PAYMENT"}
             </button>
           </div>
         </div>

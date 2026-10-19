@@ -1,34 +1,21 @@
 .app {
+  width: 90%;
   max-width: 1240px;
-  width: 92%;
   margin: 0 auto;
-  min-height: calc(100vh - 200px);
+  padding: 0 16px;
+  box-sizing: border-box;
 }
 
-/* Large Desktop & Ultra-Wide */
-@media (min-width: 1440px) {
-  .app {
-    width: 85%;
-  }
-}
-
-/* Laptops / Standard Desktops */
-@media (max-width: 1200px) {
-  .app {
-    width: 92%;
-  }
-}
-
-/* Tablets (Portrait & Landscape) */
-@media (max-width: 850px) {
+@media (max-width: 1050px) {
   .app {
     width: 94%;
+    padding: 0 12px;
   }
 }
 
-/* Phones & Small Handhelds */
-@media (max-width: 480px) {
+@media (max-width: 750px) {
   .app {
-    width: 95%;
+    width: 96%;
+    padding: 0 8px;
   }
 }

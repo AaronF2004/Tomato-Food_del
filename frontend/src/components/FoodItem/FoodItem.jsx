@@ -5,65 +5,60 @@ import { StoreContext } from "../../context/StoreContext";
 const FoodItem = ({ id, name, price, description, image, category }) => {
   const { cartItems, addToCart, removeFromCart, url } = useContext(StoreContext);
 
-  // Determine veg flag (Pure Veg, Salad, etc.)
-  const isVeg = ["Pure Veg", "Salad", "Pasta", "Cake", "Desserts"].includes(category);
-
-  // Generate consistent rating and delivery time based on item id
-  const ratingScore = ((Number(id?.slice(-2) || 42) % 15) / 10 + 4.0).toFixed(1);
+  const isPureVeg = category === "Pure Veg" || category === "Salad";
+  const quantity = cartItems[id] || 0;
 
   return (
     <div className="zomato-card">
-      <div className="card-media">
+      {/* Food Image & Overlays */}
+      <div className="zomato-card-media">
         <img
-          className="food-photo"
           src={
             image && (image.startsWith("http") || image.startsWith("/"))
               ? image
               : `${url}/images/${image}`
           }
           alt={name}
-          loading="lazy"
+          className="zomato-card-img"
         />
 
-        {/* Veg / Non-Veg Indicator */}
-        <div className={`diet-marker ${isVeg ? "veg" : "non-veg"}`} title={isVeg ? "Pure Veg" : "Non-Veg"}>
-          <div className="marker-dot"></div>
-        </div>
+        {/* Veg/Non-Veg icon badge */}
+        <span className={`diet-icon ${isPureVeg ? "veg" : "non-veg"}`}>
+          <span className="diet-dot"></span>
+        </span>
 
-        {/* Promo discount badge */}
-        <div className="promo-badge">50% OFF up to $5</div>
+        {/* Promo tag */}
+        <div className="card-badge-promo">50% OFF up to $5</div>
 
-        {/* Delivery Time Pill */}
-        <div className="delivery-time">25-30 min</div>
+        {/* Delivery duration pill */}
+        <div className="card-badge-time">25-30 min</div>
       </div>
 
-      <div className="card-body">
-        <div className="card-title-row">
-          <h3 className="food-name" title={name}>{name}</h3>
-          <div className="rating-tag">
-            <span>{ratingScore}</span>
-            <span className="star">★</span>
-          </div>
+      {/* Food Details */}
+      <div className="zomato-card-body">
+        <div className="zomato-card-head">
+          <h4 className="dish-title">{name}</h4>
+          <span className="rating-pill">4.5 ★</span>
         </div>
 
-        <p className="food-category-pill">{category}</p>
-        <p className="food-desc">{description}</p>
+        <p className="dish-category-label">{category || "North Indian"}</p>
+        <p className="dish-snippet">{description}</p>
 
-        <div className="card-footer">
-          <div className="price-block">
-            <span className="currency">$</span>
-            <span className="amount">{price}</span>
+        <div className="zomato-card-footer">
+          <div className="dish-pricing">
+            <span className="currency-symbol">$</span>
+            <span className="dish-price">{price}</span>
           </div>
 
-          {!cartItems || !cartItems[id] ? (
+          {quantity === 0 ? (
             <button className="zomato-add-btn" onClick={() => addToCart(id)}>
-              ADD <span className="plus">+</span>
+              ADD <span>+</span>
             </button>
           ) : (
             <div className="zomato-counter">
-              <button onClick={() => removeFromCart(id)} aria-label="Decrease">−</button>
-              <span>{cartItems[id]}</span>
-              <button onClick={() => addToCart(id)} aria-label="Increase">+</button>
+              <button onClick={() => removeFromCart(id)}>-</button>
+              <span>{quantity}</span>
+              <button onClick={() => addToCart(id)}>+</button>
             </div>
           )}
         </div>

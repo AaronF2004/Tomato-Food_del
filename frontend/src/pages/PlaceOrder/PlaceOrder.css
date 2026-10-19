@@ -1,98 +1,101 @@
-.place-order-wrapper {
-  max-width: 1180px;
-  margin: 35px auto 70px;
+.place-order-page {
+  max-width: 1200px;
+  width: 90%;
+  margin: 40px auto 70px auto;
   padding: 0 16px;
-  animation: fadeIn 0.35s ease;
+  box-sizing: border-box;
+  min-height: 65vh;
 }
 
-.place-order-form {
-  display: grid;
-  grid-template-columns: 1fr 380px;
-  gap: 36px;
-  align-items: start;
+.place-order-container {
+  display: flex;
+  gap: 32px;
+  align-items: flex-start;
+  width: 100%;
 }
 
-/* ===================================================
-   LEFT COLUMN: FORM FIELDS
-=================================================== */
-.place-order-left-card {
+/* Left Form Card */
+.delivery-info-card {
+  flex: 1;
+  min-width: 0;
   background: #ffffff;
-  border: 1px solid #ededed;
-  border-radius: 14px;
-  padding: 28px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+  border-radius: 16px;
+  border: 1px solid #e5e7eb;
+  padding: 32px;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.04);
+}
+
+.delivery-info-card h2 {
+  font-size: 22px;
+  font-weight: 800;
+  color: #111827;
+  margin: 0 0 24px 0;
+  letter-spacing: -0.4px;
+}
+
+.form-field-group {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  margin-bottom: 20px;
 }
 
-.section-title {
-  font-size: 22px;
-  font-weight: 700;
-  color: #1c1c1c;
-  margin-bottom: 6px;
+.form-field-group label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 7px;
 }
 
-.input-row {
+.form-field-group input {
+  padding: 12px 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #111827;
+  outline: none;
+  background-color: #fafafa;
+  transition: all 0.15s ease;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.form-field-group input:focus {
+  border-color: #e23744;
+  background-color: #ffffff;
+  box-shadow: 0 0 0 3px rgba(226, 55, 68, 0.12);
+}
+
+.form-field-group input::placeholder {
+  color: #9ca3af;
+  font-size: 13.5px;
+}
+
+.input-row-two {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 16px;
 }
 
-.input-group {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+/* Right Summary Card */
+.place-order-sidebar {
+  width: 350px;
+  flex-shrink: 0;
 }
 
-.input-group label {
-  font-size: 13px;
-  font-weight: 500;
-  color: #696969;
-}
-
-.input-group input {
-  padding: 11px 14px;
-  border: 1px solid #dcdcdc;
-  border-radius: 8px;
-  font-size: 14px;
-  color: #1c1c1c;
-  outline: none;
-  background-color: #fafafa;
-  transition: all 0.2s ease;
-}
-
-.input-group input:focus {
-  border-color: #ff5e43;
-  background-color: #ffffff;
-  box-shadow: 0 0 0 3px rgba(255, 94, 67, 0.12);
-}
-
-.input-group input::placeholder {
-  color: #a8a8a8;
-}
-
-/* ===================================================
-   RIGHT COLUMN: BILLING & PAYMENT
-=================================================== */
-.place-order-right-card {
-  position: sticky;
-  top: 90px;
-}
-
-.summary-box {
+.checkout-summary-card {
   background: #ffffff;
-  border: 1px solid #ededed;
-  border-radius: 14px;
-  padding: 26px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.04);
 }
 
-.summary-box h3 {
-  font-size: 19px;
-  font-weight: 700;
-  color: #1c1c1c;
-  margin-bottom: 18px;
+.checkout-summary-card h3 {
+  font-size: 18px;
+  font-weight: 800;
+  color: #111827;
+  margin: 0 0 18px 0;
+  letter-spacing: -0.3px;
 }
 
 .summary-row {
@@ -100,86 +103,78 @@
   justify-content: space-between;
   align-items: center;
   font-size: 14px;
-  color: #555555;
-  margin-bottom: 12px;
+  color: #4b5563;
+  margin-bottom: 14px;
 }
 
 .summary-divider {
+  border: none;
   height: 1px;
-  background-color: #eeeeee;
-  margin: 16px 0;
+  background-color: #f3f4f6;
+  margin: 18px 0;
 }
 
-.summary-row.grand-total {
+.total-highlight {
   font-size: 17px;
-  color: #1c1c1c;
+  font-weight: 800;
+  color: #111827;
   margin-bottom: 24px;
 }
 
-/* Proceed to Payment Button with Orange/Tomato styling */
-.proceed-payment-btn {
+.confirm-payment-btn {
   width: 100%;
-  padding: 14px;
-  background: linear-gradient(135deg, #ff5e43 0%, #e23744 100%);
+  background-color: #e23744;
   color: #ffffff;
   border: none;
+  padding: 13px;
+  font-size: 14px;
+  font-weight: 700;
   border-radius: 8px;
-  font-size: 15px;
-  font-weight: 600;
   cursor: pointer;
-  letter-spacing: 0.3px;
+  letter-spacing: 0.4px;
   transition: all 0.2s ease;
   box-shadow: 0 4px 14px rgba(226, 55, 68, 0.25);
-  display: block;
-  text-align: center;
 }
 
-.proceed-payment-btn:hover {
-  background: linear-gradient(135deg, #ff4c2e 0%, #cb202d 100%);
+.confirm-payment-btn:hover {
+  background-color: #cb202d;
   transform: translateY(-1px);
-  box-shadow: 0 6px 18px rgba(226, 55, 68, 0.35);
 }
 
-.proceed-payment-btn:active {
-  transform: translateY(0);
+.confirm-payment-btn:disabled {
+  background-color: #fca5a5;
+  cursor: not-allowed;
 }
 
-/* ===================================================
-   RESPONSIVE DESIGN (Tablets & Mobile)
-=================================================== */
+/* Responsive Tablets & Mobiles */
 @media (max-width: 960px) {
-  .place-order-form {
-    grid-template-columns: 1fr;
+  .place-order-page {
+    width: 94%;
+    margin-top: 24px;
+  }
+
+  .place-order-container {
+    flex-direction: column;
     gap: 24px;
   }
 
-  .place-order-right-card {
-    position: static;
+  .place-order-sidebar {
+    width: 100%;
   }
 }
 
 @media (max-width: 600px) {
-  .place-order-wrapper {
-    margin-top: 15px;
-    padding: 0 10px;
+  .place-order-page {
+    width: 96%;
+    padding: 0 8px;
   }
 
-  .place-order-left-card {
-    padding: 18px;
-    border-radius: 10px;
+  .delivery-info-card {
+    padding: 22px 18px;
   }
 
-  .input-row {
+  .input-row-two {
     grid-template-columns: 1fr;
-    gap: 14px;
-  }
-
-  .section-title {
-    font-size: 19px;
-  }
-
-  .summary-box {
-    padding: 18px;
-    border-radius: 10px;
+    gap: 0;
   }
 }

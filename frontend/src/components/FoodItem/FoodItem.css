@@ -2,229 +2,215 @@
   background: #ffffff;
   border-radius: 14px;
   overflow: hidden;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  border: 1px solid #e8e8e8;
   display: flex;
   flex-direction: column;
-  border: 1px solid #f0f0f0;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 .zomato-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
 }
 
-/* Card Media */
-.card-media {
+.zomato-card-media {
   position: relative;
   width: 100%;
-  padding-top: 66%; /* 3:2 Aspect Ratio */
-  background: #f4f4f4;
+  height: 190px;
+  background-color: #f4f4f4;
   overflow: hidden;
 }
 
-.food-photo {
-  position: absolute;
-  top: 0;
-  left: 0;
+.zomato-card-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   transition: transform 0.3s ease;
 }
 
-.zomato-card:hover .food-photo {
+.zomato-card:hover .zomato-card-img {
   transform: scale(1.04);
 }
 
-/* Veg / Non-Veg Standard Food Symbol */
-.diet-marker {
+/* Veg / Non-Veg Indicator */
+.diet-icon {
   position: absolute;
-  top: 12px;
-  left: 12px;
-  width: 16px;
-  height: 16px;
+  top: 10px;
+  left: 10px;
+  width: 15px;
+  height: 15px;
+  border: 1.5px solid #24963f;
   background: #ffffff;
-  border-radius: 3px;
   display: grid;
   place-items: center;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  border-radius: 2px;
   z-index: 2;
 }
 
-.diet-marker.veg {
-  border: 1.5px solid #24963f;
+.diet-icon.non-veg {
+  border-color: #e23744;
 }
-.diet-marker.veg .marker-dot {
-  width: 8px;
-  height: 8px;
+
+.diet-dot {
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
-  background-color: #24963f;
+  background: #24963f;
 }
 
-.diet-marker.non-veg {
-  border: 1.5px solid #e23744;
-}
-.diet-marker.non-veg .marker-dot {
-  width: 0;
-  height: 0;
-  border-left: 4px solid transparent;
-  border-right: 4px solid transparent;
-  border-bottom: 7px solid #e23744;
+.diet-icon.non-veg .diet-dot {
+  background: #e23744;
 }
 
-/* Promo Tag */
-.promo-badge {
+/* Green Promo Badge */
+.card-badge-promo {
   position: absolute;
   bottom: 10px;
   left: 10px;
-  background: rgba(36, 150, 63, 0.95);
-  color: white;
+  background: #24963f;
+  color: #ffffff;
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 700;
   padding: 3px 8px;
   border-radius: 4px;
   letter-spacing: 0.2px;
+  z-index: 2;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
 }
 
-/* Delivery Time */
-.delivery-time {
+/* Delivery Time Badge */
+.card-badge-time {
   position: absolute;
   bottom: 10px;
   right: 10px;
-  background: rgba(255, 255, 255, 0.92);
+  background: rgba(255, 255, 255, 0.95);
   color: #1c1c1c;
-  font-size: 11.5px;
+  font-size: 11px;
   font-weight: 600;
-  padding: 3px 8px;
-  border-radius: 6px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  padding: 3px 7px;
+  border-radius: 4px;
+  z-index: 2;
 }
 
 /* Card Body */
-.card-body {
-  padding: 14px 16px 16px;
+.zomato-card-body {
+  padding: 14px 14px 16px 14px;
   display: flex;
   flex-direction: column;
-  flex-grow: 1;
+  flex: 1;
 }
 
-.card-title-row {
+.zomato-card-head {
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  gap: 10px;
+  align-items: flex-start;
+  gap: 8px;
 }
 
-.food-name {
+.dish-title {
   font-size: 16px;
-  font-weight: 600;
+  font-weight: 700;
   color: #1c1c1c;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  margin: 0;
+  line-height: 1.25;
 }
 
-/* Rating Badge */
-.rating-tag {
-  background: #24963f;
-  color: white;
-  font-size: 12px;
+.rating-pill {
+  background-color: #24963f;
+  color: #ffffff;
+  font-size: 11.5px;
   font-weight: 700;
   padding: 2px 6px;
-  border-radius: 6px;
-  display: flex;
-  align-items: center;
-  gap: 2px;
+  border-radius: 5px;
   flex-shrink: 0;
 }
 
-.rating-tag .star {
-  font-size: 11px;
-}
-
-.food-category-pill {
-  font-size: 12px;
+.dish-category-label {
+  font-size: 12.5px;
   color: #828282;
-  margin-top: 3px;
+  margin: 4px 0 6px 0;
 }
 
-.food-desc {
+.dish-snippet {
   font-size: 12.5px;
   color: #696969;
-  line-height: 1.45;
-  margin: 8px 0 14px;
+  line-height: 1.4;
+  margin: 0 0 14px 0;
+  flex: 1;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  flex-grow: 1;
 }
 
-/* Footer & Buttons */
-.card-footer {
+/* Card Footer */
+.zomato-card-footer {
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  padding-top: 10px;
+  align-items: center;
   border-top: 1px dashed #f0f0f0;
+  padding-top: 12px;
 }
 
-.price-block {
-  display: flex;
-  align-items: baseline;
+.dish-pricing {
   color: #1c1c1c;
+  font-weight: 700;
 }
 
-.price-block .currency {
+.currency-symbol {
   font-size: 14px;
-  font-weight: 600;
+  margin-right: 1px;
 }
 
-.price-block .amount {
-  font-size: 19px;
-  font-weight: 700;
+.dish-price {
+  font-size: 18px;
 }
 
-/* Add Button */
+/* Red Outline ADD Button */
 .zomato-add-btn {
-  background: #ffffff;
-  color: var(--primary);
-  border: 1px solid var(--primary);
-  font-weight: 700;
+  background: #fff;
+  border: 1px solid #e23744;
+  color: #e23744;
   font-size: 13px;
-  padding: 7px 20px;
-  border-radius: 8px;
+  font-weight: 700;
+  padding: 6px 20px;
+  border-radius: 6px;
   cursor: pointer;
-  transition: all 0.2s ease;
   display: flex;
   align-items: center;
   gap: 4px;
+  transition: all 0.15s ease;
 }
 
 .zomato-add-btn:hover {
-  background: var(--primary-light);
+  background: #fff0f1;
 }
 
-/* Quantity Counter */
+/* Counter */
 .zomato-counter {
   display: flex;
   align-items: center;
-  gap: 12px;
-  background: var(--primary);
-  color: white;
-  padding: 5px 12px;
-  border-radius: 8px;
-  font-weight: 700;
-  font-size: 14px;
+  gap: 10px;
+  background: #fff0f1;
+  border: 1px solid #e23744;
+  border-radius: 6px;
+  padding: 4px 10px;
 }
 
 .zomato-counter button {
   background: transparent;
   border: none;
-  color: white;
+  color: #e23744;
   font-size: 16px;
   font-weight: 700;
   cursor: pointer;
   line-height: 1;
+  padding: 0 2px;
+}
+
+.zomato-counter span {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1c1c1c;
 }

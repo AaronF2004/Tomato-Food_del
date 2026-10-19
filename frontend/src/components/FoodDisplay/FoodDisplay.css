@@ -1,163 +1,165 @@
-.zomato-food-display {
-  margin: 30px 0 60px 0;
+.food-display {
+  margin-top: 36px;
+  margin-bottom: 60px;
 }
 
-.display-header-row {
+.food-display-header-wrap {
   display: flex;
   justify-content: space-between;
-  align-items: flex-end;
-  margin-bottom: 22px;
+  align-items: center;
   flex-wrap: wrap;
-  gap: 14px;
+  gap: 16px;
+  margin-bottom: 24px;
 }
 
-.display-header-row h2 {
+.food-display-header-wrap h2 {
   font-size: 24px;
   font-weight: 700;
   color: #1c1c1c;
+  letter-spacing: -0.3px;
+  margin: 0;
 }
 
-.results-count {
+.food-display-count {
   font-size: 13px;
-  color: #828282;
-  margin-top: 2px;
+  color: #777777;
+  margin-top: 4px;
 }
 
-/* Zomato Quick Filter Pills */
-.filter-pills-row {
+/* Filters Bar */
+.food-filters-bar {
   display: flex;
   align-items: center;
-  gap: 10px;
   flex-wrap: wrap;
+  gap: 10px;
 }
 
 .filter-pill {
-  background: #ffffff;
-  border: 1px solid #dcdcdc;
-  color: #4f4f4f;
-  padding: 6px 14px;
-  border-radius: 8px;
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
   display: flex;
   align-items: center;
   gap: 6px;
-  transition: all 0.2s ease;
+  background-color: #ffffff;
+  border: 1px solid #d9d9d9;
+  border-radius: 8px;
+  padding: 7px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #4f4f4f;
+  cursor: pointer;
+  transition: all 0.15s ease;
   user-select: none;
 }
 
 .filter-pill:hover {
-  background: #f7f7f7;
-  border-color: #a8a8a8;
+  background-color: #f8f8f8;
+  border-color: #bfbfbf;
 }
 
 .filter-pill.active {
-  background: #f0fdf4;
-  border-color: #24963f;
-  color: #24963f;
-  font-weight: 600;
-}
-
-.filter-pill.active-non-veg {
-  background: #fff0f1;
+  background-color: #fff0f1;
   border-color: #e23744;
   color: #e23744;
   font-weight: 600;
 }
 
-.filter-select {
-  outline: none;
-}
-
-.veg-dot {
+.pill-dot {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #24963f;
+  display: inline-block;
+}
+
+.veg-dot {
+  background-color: #24963f;
 }
 
 .non-veg-dot {
-  width: 0;
-  height: 0;
-  border-left: 4px solid transparent;
-  border-right: 4px solid transparent;
-  border-bottom: 7px solid #e23744;
+  background-color: #e23744;
 }
 
-/* ===================================================
-   RESPONSIVE DISH GRID (PC, Tablet, Mobile)
-=================================================== */
-.food-grid {
+/* Sort Dropdown */
+.sort-dropdown-wrap {
+  position: relative;
+}
+
+.sort-dropdown-select {
+  background-color: #ffffff;
+  border: 1px solid #d9d9d9;
+  border-radius: 8px;
+  padding: 7px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #4f4f4f;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.15s ease;
+}
+
+.sort-dropdown-select:hover,
+.sort-dropdown-select:focus {
+  border-color: #e23744;
+}
+
+/* Dishes Grid */
+.food-display-list {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 24px;
-  row-gap: 30px;
+  gap: 22px;
+  row-gap: 28px;
 }
 
-.no-results-box {
-  background: #ffffff;
-  border: 1px dashed #cfcfcf;
-  border-radius: 14px;
+/* Empty State */
+.no-dishes-found {
   text-align: center;
   padding: 60px 20px;
-  margin-top: 20px;
+  color: #777;
 }
 
-.no-results-icon {
-  font-size: 46px;
-  display: block;
-  margin-bottom: 10px;
+.no-dishes-found button {
+  margin-top: 14px;
+  background-color: #e23744;
+  color: #ffffff;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
 }
 
-.no-results-box h3 {
-  font-size: 19px;
-  color: #1c1c1c;
-  margin-bottom: 6px;
-}
-
-.no-results-box p {
-  font-size: 13.5px;
-  color: #828282;
-}
-
-/* Laptops / Small Desktops (3 columns) */
-@media (max-width: 1080px) {
-  .food-grid {
+@media (max-width: 1100px) {
+  .food-display-list {
     grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
-    row-gap: 26px;
+    gap: 18px;
+    row-gap: 24px;
   }
 }
 
-/* Tablets (2 columns) */
 @media (max-width: 768px) {
-  .display-header-row h2 {
-    font-size: 20px;
+  .food-display-header-wrap {
+    flex-direction: column;
+    align-items: flex-start;
   }
-  .food-grid {
+
+  .food-display-list {
     grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
-    row-gap: 22px;
-  }
-  .filter-pills-row {
-    width: 100%;
-    overflow-x: auto;
-    padding-bottom: 4px;
-  }
-  .filter-pill {
-    flex-shrink: 0;
+    gap: 14px;
+    row-gap: 20px;
   }
 }
 
-/* Mobile Screens (1 column, full-width card) */
 @media (max-width: 480px) {
-  .food-grid {
+  .food-display-list {
     grid-template-columns: 1fr;
     gap: 16px;
   }
-  .display-header-row {
-    flex-direction: column;
-    align-items: flex-start;
+
+  .food-filters-bar {
+    width: 100%;
+  }
+
+  .filter-pill,
+  .sort-dropdown-select {
+    font-size: 12px;
+    padding: 6px 10px;
   }
 }
