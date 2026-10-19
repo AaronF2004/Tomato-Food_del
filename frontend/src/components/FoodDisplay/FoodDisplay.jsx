@@ -2,18 +2,18 @@ import React, { useContext, useState, useMemo } from "react";
 import "./FoodDisplay.css";
 import { StoreContext } from "../../context/StoreContext";
 import FoodItem from "../FoodItem/FoodItem";
+import Loader from "../Loader/Loader";
 
 const FoodDisplay = ({ category }) => {
-  const { food_list, searchQuery, setSearchQuery } = useContext(StoreContext);
+  const { food_list, searchQuery, setSearchQuery, loadingDishes } = useContext(StoreContext);
 
-  // Filter & Sort state
-  const [dietFilter, setDietFilter] = useState("all"); // 'all' | 'veg' | 'non-veg'
+  const [dietFilter, setDietFilter] = useState("all");
   const [ratingFilter, setRatingFilter] = useState(false);
-  const [sortBy, setSortBy] = useState("popularity"); // 'popularity' | 'price-low' | 'price-high'
+  const [sortBy, setSortBy] = useState("popularity");
 
   const filteredDishes = useMemo(() => {
     let result = food_list.filter((item) => {
-      // 1. Search Query Filter (name, description, or category match)
+      // 1. Text Search Filter
       if (searchQuery.trim() !== "") {
         const query = searchQuery.toLowerCase().trim();
         const matchesName = item.name?.toLowerCase().includes(query);
@@ -32,11 +32,11 @@ const FoodDisplay = ({ category }) => {
 
       const isVeg = item.category === "Pure Veg" || item.category === "Salad";
 
-      // 3. Veg / Non-Veg Pills
+      // 3. Diet Filter
       if (dietFilter === "veg" && !isVeg) return false;
       if (dietFilter === "non-veg" && isVeg) return false;
 
-      // 4. Rating 4.0+ Pill
+      // 4. Rating Filter
       if (ratingFilter) {
         const rating = item.rating || 4.5;
         if (rating < 4.0) return false;
@@ -45,7 +45,6 @@ const FoodDisplay = ({ category }) => {
       return true;
     });
 
-    // Sort Order
     if (sortBy === "price-low") {
       result.sort((a, b) => a.price - b.price);
     } else if (sortBy === "price-high") {
@@ -64,7 +63,9 @@ const FoodDisplay = ({ category }) => {
               ? `Search Results for "${searchQuery}"`
               : "Delivery Restaurants & Dishes"}
           </h2>
-          <p className="food-display-count">Showing {filteredDishes.length} dishes</p>
+          <p className="food-display-count">
+            {!loadingDishes && `Showing ${filteredDishes.length} dishes`}
+          </p>
         </div>
 
         {/* Filter Pills Bar */}
@@ -109,7 +110,9 @@ const FoodDisplay = ({ category }) => {
         </div>
       </div>
 
-      {filteredDishes.length === 0 ? (
+      {loadingDishes ? (
+        <Loader text="Fetching the freshest dishes from kitchen..." />
+      ) : filteredDishes.length === 0 ? (
         <div className="no-dishes-found">
           <p>
             {searchQuery

@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import Navbar from "./components/Navbar/Navbar";
 import Home from "./pages/Home/Home";
 import Cart from "./pages/Cart/Cart";
@@ -12,14 +12,30 @@ import FloatingCart from "./components/FloatingCart/FloatingCart";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+// Global Scroll Restoration Handler
+const ScrollToTop = () => {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: "instant"
+    });
+  }, [pathname]);
+
+  return null;
+};
+
 const App = () => {
   const [showLogin, setShowLogin] = useState(false);
 
   return (
     <>
+      <ScrollToTop />
       <ToastContainer
         position="top-right"
-        autoClose={2500}
+        autoClose={2200}
         hideProgressBar={false}
         newestOnTop
         closeOnClick

@@ -2,11 +2,19 @@ import React, { useContext, useState } from "react";
 import "./Navbar.css";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { StoreContext } from "../../context/StoreContext";
+import { toast } from "react-toastify";
 
 const Navbar = ({ setShowLogin }) => {
   const [menu, setMenu] = useState("home");
-  const { getTotalCartAmount, token, setToken, searchQuery, setSearchQuery } =
-    useContext(StoreContext);
+  const {
+    getTotalCartAmount,
+    token,
+    setToken,
+    setCartItems,
+    searchQuery,
+    setSearchQuery
+  } = useContext(StoreContext);
+
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -17,17 +25,24 @@ const Navbar = ({ setShowLogin }) => {
     }
   };
 
-  const logout = () => {
+  const handleLogout = () => {
     localStorage.removeItem("token");
     setToken("");
-    navigate("/");
+    setCartItems({});
+    toast.info("Logged out successfully");
+
+    // If currently on an authenticated-only page, redirect back to home
+    if (location.pathname === "/order" || location.pathname === "/myorders") {
+      navigate("/", { replace: true });
+    }
   };
 
   return (
     <header className="navbar-wrapper">
       <div className="navbar-container">
-        {/* Top Row */}
+        {/* Top Header Row */}
         <div className="navbar-top-row">
+          {/* Logo */}
           <Link to="/" className="navbar-brand">
             <span className="brand-name">Tomato</span>
             <span className="brand-dot">.</span>
@@ -58,7 +73,7 @@ const Navbar = ({ setShowLogin }) => {
             )}
           </div>
 
-          {/* Nav links */}
+          {/* Desktop Navigation Links */}
           <nav className="navbar-links-desktop">
             <Link
               to="/"
@@ -76,8 +91,9 @@ const Navbar = ({ setShowLogin }) => {
             </a>
           </nav>
 
-          {/* Right section */}
+          {/* Right Action Icons (Cart + Authentication) */}
           <div className="navbar-right-actions">
+            {/* Cart Bag Icon */}
             <Link to="/cart" className="cart-action-btn" title="View Cart">
               <svg
                 viewBox="0 0 24 24"
@@ -93,6 +109,7 @@ const Navbar = ({ setShowLogin }) => {
               {getTotalCartAmount() > 0 && <span className="cart-dot-indicator"></span>}
             </Link>
 
+            {/* Authentication Buttons & Account Pill */}
             {!token ? (
               <button className="auth-signin-btn" onClick={() => setShowLogin(true)}>
                 Sign In
@@ -109,6 +126,7 @@ const Navbar = ({ setShowLogin }) => {
                   <span className="account-dropdown-arrow">▾</span>
                 </div>
 
+                {/* Dropdown Card with hover bridge */}
                 <div className="account-dropdown-card">
                   <div className="account-card-header">
                     <p className="greeting-text">Hello,</p>
@@ -132,7 +150,8 @@ const Navbar = ({ setShowLogin }) => {
                       </svg>
                       <span>Orders</span>
                     </div>
-                    <div className="account-menu-item" onClick={logout}>
+
+                    <div className="account-menu-item" onClick={handleLogout}>
                       <svg
                         viewBox="0 0 24 24"
                         fill="none"
@@ -153,7 +172,7 @@ const Navbar = ({ setShowLogin }) => {
           </div>
         </div>
 
-        {/* Mobile Search Bar */}
+        {/* Mobile / Tablet Search Bar */}
         <div className="navbar-search-mobile">
           <svg
             className="search-svg-icon"
