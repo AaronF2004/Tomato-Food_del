@@ -13,6 +13,19 @@ const MyOrders = ({ setShowLogin }) => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
+  // Route mobile back actions to Home
+  useEffect(() => {
+    window.history.pushState(null, "", window.location.href);
+
+    const onBack = (e) => {
+      e.preventDefault();
+      navigate("/", { replace: true });
+    };
+
+    window.addEventListener("popstate", onBack);
+    return () => window.removeEventListener("popstate", onBack);
+  }, [navigate]);
+
   const fetchOrders = async () => {
     try {
       const response = await axios.post(
@@ -85,7 +98,7 @@ const MyOrders = ({ setShowLogin }) => {
         {/* Home Pill Button */}
         <button
           className="my-orders-home-btn"
-          onClick={() => navigate("/")}
+          onClick={() => navigate("/", { replace: true })}
           title="Return to Home"
         >
           <svg
@@ -112,7 +125,7 @@ const MyOrders = ({ setShowLogin }) => {
           <button
             className="orders-signin-btn"
             style={{ marginTop: "14px" }}
-            onClick={() => navigate("/")}
+            onClick={() => navigate("/", { replace: true })}
           >
             Browse Menu
           </button>
