@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState, useRef } from "react";
 import "./MyOrders.css";
 import { StoreContext } from "../../context/StoreContext";
 import axios from "axios";
@@ -12,20 +12,24 @@ const MyOrders = ({ setShowLogin }) => {
   const [trackingOrder, setTrackingOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const isNavigatingRef = useRef(false);
 
-  // Intercept the browser/device back action and redirect directly to Home
+  // Trap back navigation and unconditionally route to Home ('/')
   useEffect(() => {
-    window.history.pushState(null, "", window.location.href);
+    // Push dummy state to act as a barrier for browser back action
+    window.history.pushState({ page: "myorders_guard" }, "", window.location.href);
 
-    const onBackButtonEvent = (event) => {
-      event.preventDefault();
-      navigate("/", { replace: true });
+    const handleBackNavigation = () => {
+      if (!isNavigatingRef.current) {
+        isNavigatingRef.current = true;
+        navigate("/", { replace: true });
+      }
     };
 
-    window.addEventListener("popstate", onBackButtonEvent);
+    window.addEventListener("popstate", handleBackNavigation);
 
     return () => {
-      window.removeEventListener("popstate", onBackButtonEvent);
+      window.removeEventListener("popstate", handleBackNavigation);
     };
   }, [navigate]);
 
@@ -92,25 +96,6 @@ const MyOrders = ({ setShowLogin }) => {
     <div className="my-orders-page">
       <div className="my-orders-header">
         <div className="my-orders-title-left">
-          {/* Explicit Back Arrow to Home */}
-          <button
-            className="my-orders-back-nav-btn"
-            onClick={() => navigate("/", { replace: true })}
-            title="Back to Home"
-          >
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="back-icon-svg"
-            >
-              <line x1="19" y1="12" x2="5" y2="12"></line>
-              <polyline points="12 19 5 12 12 5"></polyline>
-            </svg>
-          </button>
           <h2>My Orders</h2>
           <span className="orders-count-badge">
             {data.length} {data.length === 1 ? "Order" : "Orders"}

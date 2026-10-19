@@ -23,7 +23,7 @@ const Verify = () => {
       if (response.data.success) {
         setCartItems({});
         toast.success("Order confirmed successfully!");
-        // Use replace: true so the user cannot navigate back to /verify via browser back button
+        // Replace current history entry with /myorders
         navigate("/myorders", { replace: true });
       } else {
         toast.error("Payment could not be verified or was cancelled.");
