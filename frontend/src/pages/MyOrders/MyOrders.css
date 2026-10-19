@@ -16,8 +16,14 @@
 .my-orders-header {
   display: flex;
   align-items: center;
-  gap: 12px;
+  justify-content: space-between;
   margin-bottom: 24px;
+}
+
+.my-orders-title-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .my-orders-header h2 {
@@ -35,6 +41,35 @@
   font-weight: 700;
   padding: 4px 12px;
   border-radius: 12px;
+}
+
+/* Home Return Button */
+.my-orders-home-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #ffffff;
+  color: #e23744;
+  border: 1px solid #ffd2cc;
+  padding: 7px 14px;
+  border-radius: 20px;
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 1px 4px rgba(226, 55, 68, 0.08);
+  transition: all 0.2s ease;
+}
+
+.my-orders-home-btn:hover {
+  background-color: #e23744;
+  color: #ffffff;
+  border-color: #e23744;
+  transform: translateY(-1px);
+}
+
+.home-icon-svg {
+  width: 16px;
+  height: 16px;
 }
 
 .orders-list-container {
@@ -114,7 +149,7 @@
   font-weight: 500;
 }
 
-/* Unauthenticated State */
+/* Unauthenticated / Empty State */
 .my-orders-unauth,
 .my-orders-empty {
   text-align: center;

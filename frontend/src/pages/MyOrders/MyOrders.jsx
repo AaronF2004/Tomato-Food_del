@@ -4,12 +4,30 @@ import { StoreContext } from "../../context/StoreContext";
 import axios from "axios";
 import { toast } from "react-toastify";
 import Loader from "../../components/Loader/Loader";
+import { useNavigate } from "react-router-dom";
 
 const MyOrders = ({ setShowLogin }) => {
   const { url, token, authChecked } = useContext(StoreContext);
   const [data, setData] = useState([]);
   const [trackingOrder, setTrackingOrder] = useState(null);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+
+  // Intercept the browser / mobile hardware Back button to always return to Home
+  useEffect(() => {
+    window.history.pushState(null, document.title, window.location.href);
+
+    const handlePopState = (event) => {
+      event.preventDefault();
+      navigate("/", { replace: true });
+    };
+
+    window.addEventListener("popstate", handlePopState);
+
+    return () => {
+      window.removeEventListener("popstate", handlePopState);
+    };
+  }, [navigate]);
 
   const fetchOrders = async () => {
     try {
@@ -73,10 +91,33 @@ const MyOrders = ({ setShowLogin }) => {
   return (
     <div className="my-orders-page">
       <div className="my-orders-header">
-        <h2>My Orders</h2>
-        <span className="orders-count-badge">
-          {data.length} {data.length === 1 ? "Order" : "Orders"}
-        </span>
+        <div className="my-orders-title-left">
+          <h2>My Orders</h2>
+          <span className="orders-count-badge">
+            {data.length} {data.length === 1 ? "Order" : "Orders"}
+          </span>
+        </div>
+
+        {/* Home Button for Mobile/Tablet */}
+        <button
+          className="my-orders-home-btn"
+          onClick={() => navigate("/", { replace: true })}
+          title="Return to Home"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="home-icon-svg"
+          >
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+          </svg>
+          <span>Home</span>
+        </button>
       </div>
 
       {loading ? (
@@ -84,6 +125,13 @@ const MyOrders = ({ setShowLogin }) => {
       ) : data.length === 0 ? (
         <div className="my-orders-empty">
           <p>You haven't placed any orders yet.</p>
+          <button
+            className="orders-signin-btn"
+            style={{ marginTop: "14px" }}
+            onClick={() => navigate("/")}
+          >
+            Browse Menu
+          </button>
         </div>
       ) : (
         <div className="orders-list-container">
