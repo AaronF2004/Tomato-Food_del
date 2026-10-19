@@ -3,9 +3,10 @@ import "./MyOrders.css";
 import { StoreContext } from "../../context/StoreContext";
 import axios from "axios";
 import { toast } from "react-toastify";
+import Loader from "../../components/Loader/Loader";
 
 const MyOrders = ({ setShowLogin }) => {
-  const { url, token } = useContext(StoreContext);
+  const { url, token, authChecked } = useContext(StoreContext);
   const [data, setData] = useState([]);
   const [trackingOrder, setTrackingOrder] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -28,13 +29,14 @@ const MyOrders = ({ setShowLogin }) => {
   };
 
   useEffect(() => {
-    if (token) {
-      fetchOrders();
-    } else {
-      setLoading(false);
-      setShowLogin(true);
+    if (authChecked) {
+      if (token) {
+        fetchOrders();
+      } else {
+        setLoading(false);
+      }
     }
-  }, [token]);
+  }, [token, authChecked]);
 
   const handleTrack = (order) => {
     setTrackingOrder(order);
@@ -48,22 +50,20 @@ const MyOrders = ({ setShowLogin }) => {
     return "step";
   };
 
+  if (!authChecked) {
+    return (
+      <div className="my-orders-loading-wrap">
+        <Loader text="Loading account details..." />
+      </div>
+    );
+  }
+
   if (!token) {
     return (
-      <div className="my-orders" style={{ textAlign: "center", padding: "60px 0" }}>
+      <div className="my-orders-unauth">
         <h2>My Orders</h2>
-        <p style={{ margin: "20px 0", color: "#666" }}>Please sign in to track and view your order history.</p>
-        <button
-          onClick={() => setShowLogin(true)}
-          style={{
-            padding: "10px 24px",
-            background: "tomato",
-            color: "#fff",
-            border: "none",
-            borderRadius: "4px",
-            cursor: "pointer"
-          }}
-        >
+        <p>Please sign in to view and track your orders.</p>
+        <button className="orders-signin-btn" onClick={() => setShowLogin(true)}>
           Sign In
         </button>
       </div>
@@ -71,44 +71,67 @@ const MyOrders = ({ setShowLogin }) => {
   }
 
   return (
-    <div className="my-orders">
-      <h2>My Orders</h2>
+    <div className="my-orders-page">
+      <div className="my-orders-header">
+        <h2>My Orders</h2>
+        <span className="orders-count-badge">
+          {data.length} {data.length === 1 ? "Order" : "Orders"}
+        </span>
+      </div>
+
       {loading ? (
-        <p style={{ marginTop: "30px", color: "#777" }}>Loading your orders...</p>
+        <Loader text="Fetching your orders from the kitchen..." />
       ) : data.length === 0 ? (
-        <div style={{ padding: "40px 0", textAlign: "center", color: "#777" }}>
+        <div className="my-orders-empty">
           <p>You haven't placed any orders yet.</p>
         </div>
       ) : (
-        <div className="container">
+        <div className="orders-list-container">
           {data.map((order, index) => (
-            <div key={index} className="my-orders-order">
-              <p className="order-items-summary">
-                {order.items.map((item, idx) =>
-                  idx === order.items.length - 1
-                    ? `${item.name} x ${item.quantity}`
-                    : `${item.name} x ${item.quantity}, `
-                )}
-              </p>
-              <p className="order-price">${order.amount}.00</p>
-              <p className="order-count">Items: {order.items.length}</p>
-              <p className="order-status-badge">
-                <span>&#x25cf;</span> <b>{order.status}</b>
-              </p>
-              <button onClick={() => handleTrack(order)}>Track Order</button>
+            <div key={index} className="order-card-row">
+              <div className="order-items-summary">
+                <p>
+                  {order.items.map((item, idx) =>
+                    idx === order.items.length - 1
+                      ? `${item.name} x ${item.quantity}`
+                      : `${item.name} x ${item.quantity}, `
+                  )}
+                </p>
+              </div>
+
+              <div className="order-amount-col">
+                <span className="mobile-order-label">Total: </span>
+                ${order.amount}.00
+              </div>
+
+              <div className="order-items-count">
+                <span className="mobile-order-label">Items: </span>
+                {order.items.length}
+              </div>
+
+              <div className="order-status-badge">
+                <span className="status-dot">&#x25cf;</span>
+                <b>{order.status}</b>
+              </div>
+
+              <button className="track-order-btn" onClick={() => handleTrack(order)}>
+                Track Order
+              </button>
             </div>
           ))}
         </div>
       )}
 
+      {/* Live Order Tracking Modal */}
       {trackingOrder && (
         <div className="track-modal-overlay" onClick={() => setTrackingOrder(null)}>
           <div className="track-modal" onClick={(e) => e.stopPropagation()}>
             <div className="track-modal-header">
-              <h3>Live Tracking</h3>
+              <h3>Live Order Tracking</h3>
               <span className="close-btn" onClick={() => setTrackingOrder(null)}>✕</span>
             </div>
-            <p className="order-id-label">Order Reference: #{trackingOrder._id}</p>
+            <p className="order-ref-text">Order ID: #{trackingOrder._id}</p>
+
             <div className="tracking-timeline">
               <div className={getStepClass(trackingOrder.status, "Food Processing")}>
                 <div className="step-circle">1</div>
@@ -125,11 +148,13 @@ const MyOrders = ({ setShowLogin }) => {
                 <p>Delivered</p>
               </div>
             </div>
+
             <div className="track-delivery-details">
               <p><b>Recipient:</b> {trackingOrder.address.firstName} {trackingOrder.address.lastName}</p>
-              <p><b>Address:</b> {trackingOrder.address.street}, {trackingOrder.address.city}, {trackingOrder.address.zipcode}</p>
-              <p><b>Amount:</b> ${trackingOrder.amount}.00</p>
+              <p><b>Delivery Address:</b> {trackingOrder.address.street}, {trackingOrder.address.city}, {trackingOrder.address.zipcode}</p>
+              <p><b>Paid Amount:</b> ${trackingOrder.amount}.00</p>
             </div>
+
             <button
               className="refresh-status-btn"
               onClick={async () => {

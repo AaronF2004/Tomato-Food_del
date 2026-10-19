@@ -6,7 +6,8 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
 const PlaceOrder = ({ setShowLogin }) => {
-  const { getTotalCartAmount, token, food_list, cartItems, url } = useContext(StoreContext);
+  const { getTotalCartAmount, token, authChecked, food_list, cartItems, url } =
+    useContext(StoreContext);
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
@@ -22,17 +23,29 @@ const PlaceOrder = ({ setShowLogin }) => {
     phone: ""
   });
 
-  // Ensure scroll lands at the top
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
+  // Only trigger login prompts after authChecked confirms whether token exists
+  useEffect(() => {
+    if (authChecked) {
+      if (!token) {
+        toast.info("Please sign in to access checkout.");
+        setShowLogin(true);
+        navigate("/cart");
+      } else if (getTotalCartAmount() === 0) {
+        toast.warn("Your cart is empty.");
+        navigate("/cart");
+      }
+    }
+  }, [token, authChecked]);
+
   const onChangeHandler = (event) => {
     const { name, value } = event.target;
 
-    // Strict 10-digit number enforcement for phone
     if (name === "phone") {
-      const sanitized = value.replace(/\D/g, ""); // Accept digits only
+      const sanitized = value.replace(/\D/g, "");
       if (sanitized.length <= 10) {
         setData((prev) => ({ ...prev, phone: sanitized }));
       }
@@ -51,7 +64,6 @@ const PlaceOrder = ({ setShowLogin }) => {
       return;
     }
 
-    // Explicit 10-digit validation check
     if (data.phone.length !== 10) {
       toast.error("Please enter a valid 10-digit mobile number.");
       return;
@@ -72,7 +84,8 @@ const PlaceOrder = ({ setShowLogin }) => {
     const orderData = {
       address: data,
       items: orderItems,
-      amount: getTotalCartAmount() + 2
+      amount: getTotalCartAmount() + 2,
+      frontend_url: window.location.origin // Dynamically passes http://192.168.x.x or https://tomato-food-frontend.vercel.app
     };
 
     try {
@@ -87,22 +100,12 @@ const PlaceOrder = ({ setShowLogin }) => {
         toast.error(response.data.message || "Failed to initiate payment.");
       }
     } catch (error) {
+      console.error("Order error:", error);
       toast.error("Unable to place order at this time. Please try again.");
     } finally {
       setLoading(false);
     }
   };
-
-  useEffect(() => {
-    if (!token) {
-      toast.info("Please sign in to access checkout.");
-      setShowLogin(true);
-      navigate("/cart");
-    } else if (getTotalCartAmount() === 0) {
-      toast.warn("Your cart is empty.");
-      navigate("/cart");
-    }
-  }, [token]);
 
   const subtotal = getTotalCartAmount();
   const deliveryFee = subtotal === 0 ? 0 : 2;
@@ -111,7 +114,6 @@ const PlaceOrder = ({ setShowLogin }) => {
   return (
     <div className="place-order-page">
       <form onSubmit={placeOrder} className="place-order-container">
-        {/* Left: Form Fields (Image 3) */}
         <div className="delivery-info-card">
           <h2>Delivery Information</h2>
 
@@ -230,7 +232,6 @@ const PlaceOrder = ({ setShowLogin }) => {
           </div>
         </div>
 
-        {/* Right: Cart Totals Card (Image 3) */}
         <div className="place-order-sidebar">
           <div className="checkout-summary-card">
             <h3>Cart Totals</h3>

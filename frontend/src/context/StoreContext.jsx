@@ -7,11 +7,13 @@ export const StoreContext = createContext(null);
 const StoreContextProvider = (props) => {
   const [cartItems, setCartItems] = useState({});
   const [food_list, setFoodList] = useState([]);
-  const [token, setToken] = useState("");
+  
+  // Synchronous initialization prevents the signup modal from flashing on refresh
+  const [token, setToken] = useState(() => localStorage.getItem("token") || "");
+  const [authChecked, setAuthChecked] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [loadingDishes, setLoadingDishes] = useState(true);
 
-  // Verified Render Backend Endpoint
   const url = "https://tomato-backend-xfdl.onrender.com";
 
   const addToCart = async (itemId) => {
@@ -77,7 +79,6 @@ const StoreContextProvider = (props) => {
       }
     } catch (error) {
       console.error("Error fetching dishes:", error);
-      toast.error("Connecting to server. Please allow 30-40 seconds on cold start.");
     } finally {
       setLoadingDishes(false);
     }
@@ -99,15 +100,16 @@ const StoreContextProvider = (props) => {
   };
 
   useEffect(() => {
-    async function loadData() {
+    async function initData() {
       await fetchFoodList();
-      const storedToken = localStorage.getItem("token");
-      if (storedToken) {
-        setToken(storedToken);
-        await loadCartData(storedToken);
+      const savedToken = localStorage.getItem("token");
+      if (savedToken) {
+        setToken(savedToken);
+        await loadCartData(savedToken);
       }
+      setAuthChecked(true);
     }
-    loadData();
+    initData();
   }, []);
 
   const contextValue = {
@@ -120,6 +122,7 @@ const StoreContextProvider = (props) => {
     url,
     token,
     setToken,
+    authChecked,
     searchQuery,
     setSearchQuery,
     loadingDishes,
