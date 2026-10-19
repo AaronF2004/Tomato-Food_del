@@ -12,24 +12,26 @@ const MyOrders = ({ setShowLogin }) => {
   const [trackingOrder, setTrackingOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-  const isNavigatingRef = useRef(false);
+  const redirectedRef = useRef(false);
 
-  // Trap back navigation and unconditionally route to Home ('/')
+  // Anti-Stripe Back-Trap for Mobile & Browser Navigation
   useEffect(() => {
-    // Push dummy state to act as a barrier for browser back action
-    window.history.pushState({ page: "myorders_guard" }, "", window.location.href);
+    // 1. Push barrier state entries into browser history so back button cannot reach Stripe
+    window.history.pushState({ trap: 1 }, "", window.location.href);
+    window.history.pushState({ trap: 2 }, "", window.location.href);
 
-    const handleBackNavigation = () => {
-      if (!isNavigatingRef.current) {
-        isNavigatingRef.current = true;
+    const handlePopState = (event) => {
+      if (!redirectedRef.current) {
+        redirectedRef.current = true;
+        // Intercept and route directly to Home page
         navigate("/", { replace: true });
       }
     };
 
-    window.addEventListener("popstate", handleBackNavigation);
+    window.addEventListener("popstate", handlePopState);
 
     return () => {
-      window.removeEventListener("popstate", handleBackNavigation);
+      window.removeEventListener("popstate", handlePopState);
     };
   }, [navigate]);
 
@@ -105,7 +107,10 @@ const MyOrders = ({ setShowLogin }) => {
         {/* Home Pill Button */}
         <button
           className="my-orders-home-btn"
-          onClick={() => navigate("/", { replace: true })}
+          onClick={() => {
+            redirectedRef.current = true;
+            navigate("/", { replace: true });
+          }}
           title="Return to Home"
         >
           <svg
@@ -132,7 +137,10 @@ const MyOrders = ({ setShowLogin }) => {
           <button
             className="orders-signin-btn"
             style={{ marginTop: "14px" }}
-            onClick={() => navigate("/", { replace: true })}
+            onClick={() => {
+              redirectedRef.current = true;
+              navigate("/", { replace: true });
+            }}
           >
             Browse Menu
           </button>
