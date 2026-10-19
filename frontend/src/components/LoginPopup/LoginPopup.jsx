@@ -5,8 +5,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 
 const LoginPopup = ({ setShowLogin }) => {
-  const { url, setToken, loadCartData } = useContext(StoreContext);
-  // Default directly to "Sign Up" as requested
+  const { url, setToken, setUserName, loadCartData } = useContext(StoreContext);
   const [currState, setCurrState] = useState("Sign Up");
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState({
@@ -15,7 +14,6 @@ const LoginPopup = ({ setShowLogin }) => {
     password: ""
   });
 
-  // Ensure all fields are blank when the modal opens
   useEffect(() => {
     setData({
       name: "",
@@ -54,15 +52,20 @@ const LoginPopup = ({ setShowLogin }) => {
 
       if (response.data.success) {
         const receivedToken = response.data.token;
+        // If registering and backend didn't echo name, fall back to data.name
+        const receivedName = response.data.name || (isLogin ? data.email.split("@")[0] : data.name);
+
         setToken(receivedToken);
+        setUserName(receivedName);
         localStorage.setItem("token", receivedToken);
+        localStorage.setItem("userName", receivedName);
 
         if (loadCartData) {
           await loadCartData(receivedToken);
         }
 
         toast.success(
-          isLogin ? "Signed in successfully!" : "Account created successfully!"
+          isLogin ? `Welcome back, ${receivedName}!` : `Account created! Welcome, ${receivedName}!`
         );
         setShowLogin(false);
       } else {

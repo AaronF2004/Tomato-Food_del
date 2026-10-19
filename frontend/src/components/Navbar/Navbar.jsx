@@ -10,6 +10,8 @@ const Navbar = ({ setShowLogin }) => {
     getTotalCartAmount,
     token,
     setToken,
+    userName,
+    setUserName,
     setCartItems,
     searchQuery,
     setSearchQuery
@@ -27,15 +29,21 @@ const Navbar = ({ setShowLogin }) => {
 
   const handleLogout = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("userName");
     setToken("");
+    setUserName("");
     setCartItems({});
     toast.info("Logged out successfully");
 
-    // If currently on an authenticated-only page, redirect back to home
     if (location.pathname === "/order" || location.pathname === "/myorders") {
       navigate("/", { replace: true });
     }
   };
+
+  // Helper to cleanly shorten name for compact navbar display
+  const displayName = userName || "User";
+  const pillName =
+    displayName.length > 12 ? `${displayName.slice(0, 11)}...` : displayName;
 
   return (
     <header className="navbar-wrapper">
@@ -91,7 +99,7 @@ const Navbar = ({ setShowLogin }) => {
             </a>
           </nav>
 
-          {/* Right Action Icons (Cart + Authentication) */}
+          {/* Right Action Icons (Cart + Dynamic Authentication) */}
           <div className="navbar-right-actions">
             {/* Cart Bag Icon */}
             <Link to="/cart" className="cart-action-btn" title="View Cart">
@@ -109,7 +117,7 @@ const Navbar = ({ setShowLogin }) => {
               {getTotalCartAmount() > 0 && <span className="cart-dot-indicator"></span>}
             </Link>
 
-            {/* Authentication Buttons & Account Pill */}
+            {/* Dynamic Sign In vs Dynamic User Pill */}
             {!token ? (
               <button className="auth-signin-btn" onClick={() => setShowLogin(true)}>
                 Sign In
@@ -122,15 +130,17 @@ const Navbar = ({ setShowLogin }) => {
                       <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
                     </svg>
                   </div>
-                  <span className="account-display-name">Aaron Fernan...</span>
+                  {/* Dynamic user name in navbar pill */}
+                  <span className="account-display-name">{pillName}</span>
                   <span className="account-dropdown-arrow">▾</span>
                 </div>
 
-                {/* Dropdown Card with hover bridge */}
+                {/* Dropdown Card */}
                 <div className="account-dropdown-card">
                   <div className="account-card-header">
                     <p className="greeting-text">Hello,</p>
-                    <h4 className="user-full-name">Aaron Fernandes</h4>
+                    {/* Dynamic full user name in dropdown header */}
+                    <h4 className="user-full-name">{displayName}</h4>
                   </div>
                   <div className="account-card-menu">
                     <div

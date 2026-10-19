@@ -8,8 +8,9 @@ const StoreContextProvider = (props) => {
   const [cartItems, setCartItems] = useState({});
   const [food_list, setFoodList] = useState([]);
   
-  // Synchronous initialization prevents the signup modal from flashing on refresh
+  // Synchronous token & userName initialization from localStorage
   const [token, setToken] = useState(() => localStorage.getItem("token") || "");
+  const [userName, setUserName] = useState(() => localStorage.getItem("userName") || "");
   const [authChecked, setAuthChecked] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [loadingDishes, setLoadingDishes] = useState(true);
@@ -103,8 +104,10 @@ const StoreContextProvider = (props) => {
     async function initData() {
       await fetchFoodList();
       const savedToken = localStorage.getItem("token");
+      const savedName = localStorage.getItem("userName");
       if (savedToken) {
         setToken(savedToken);
+        if (savedName) setUserName(savedName);
         await loadCartData(savedToken);
       }
       setAuthChecked(true);
@@ -122,6 +125,8 @@ const StoreContextProvider = (props) => {
     url,
     token,
     setToken,
+    userName,
+    setUserName,
     authChecked,
     searchQuery,
     setSearchQuery,
