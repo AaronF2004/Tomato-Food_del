@@ -7,7 +7,6 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 // Placing User Order from Frontend
 export const placeOrder = async (req, res) => {
   try {
-    // Explicitly prioritize frontend_url sent from the browser client
     const frontend_url =
       req.body.frontend_url ||
       req.headers.origin ||
@@ -21,7 +20,6 @@ export const placeOrder = async (req, res) => {
       address: req.body.address
     });
     await newOrder.save();
-    await userModel.findByIdAndUpdate(req.body.userId, { cartData: {} });
 
     const line_items = req.body.items.map((item) => ({
       price_data: {
@@ -44,8 +42,10 @@ export const placeOrder = async (req, res) => {
     const session = await stripe.checkout.sessions.create({
       line_items: line_items,
       mode: "payment",
+      // When payment succeeds, goes to the confirmation screen
       success_url: `${frontend_url}/verify?success=true&orderId=${newOrder._id}`,
-      cancel_url: `${frontend_url}/verify?success=false&orderId=${newOrder._id}`
+      // When user clicks Back or Cancel on Stripe Checkout, takes them straight back to /order
+      cancel_url: `${frontend_url}/order?cancelled=true&orderId=${newOrder._id}`
     });
 
     res.json({ success: true, session_url: session.url });
@@ -61,6 +61,10 @@ export const verifyOrder = async (req, res) => {
   try {
     if (success === "true") {
       await orderModel.findByIdAndUpdate(orderId, { payment: true });
+      const order = await orderModel.findById(orderId);
+      if (order) {
+        await userModel.findByIdAndUpdate(order.userId, { cartData: {} });
+      }
       res.json({ success: true, message: "Paid" });
     } else {
       await orderModel.findByIdAndDelete(orderId);
@@ -94,7 +98,7 @@ export const listOrders = async (req, res) => {
   }
 };
 
-// Update order status
+// API for updating order status
 export const updateStatus = async (req, res) => {
   try {
     await orderModel.findByIdAndUpdate(req.body.orderId, {

@@ -2,39 +2,62 @@ import React, { useContext, useEffect, useState } from "react";
 import "./PlaceOrder.css";
 import { StoreContext } from "../../context/StoreContext";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "react-toastify";
 
 const PlaceOrder = ({ setShowLogin }) => {
   const { getTotalCartAmount, token, authChecked, food_list, cartItems, url } =
     useContext(StoreContext);
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [loading, setLoading] = useState(false);
 
-  const [data, setData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    street: "",
-    city: "",
-    state: "",
-    zipcode: "",
-    country: "",
-    phone: ""
+  // Restore previous delivery info if stored in sessionStorage
+  const [data, setData] = useState(() => {
+    const saved = sessionStorage.getItem("savedDeliveryAddress");
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        // Fallback to default
+      }
+    }
+    return {
+      firstName: "",
+      lastName: "",
+      email: "",
+      street: "",
+      city: "",
+      state: "",
+      zipcode: "",
+      country: "",
+      phone: ""
+    };
   });
 
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, []);
 
-  // Only trigger login prompts after authChecked confirms whether token exists
+    // If redirected back from Stripe cancellation
+    if (searchParams.get("cancelled") === "true") {
+      toast.info("Payment was cancelled. You can review your details and try again.");
+      searchParams.delete("cancelled");
+      const orderId = searchParams.get("orderId");
+      if (orderId) {
+        axios.post(`${url}/api/order/verify`, { success: "false", orderId }).catch(() => {});
+        searchParams.delete("orderId");
+      }
+      setSearchParams(searchParams, { replace: true });
+    }
+  }, [searchParams, setSearchParams, url]);
+
   useEffect(() => {
     if (authChecked) {
       if (!token) {
         toast.info("Please sign in to access checkout.");
         setShowLogin(true);
         navigate("/cart");
-      } else if (getTotalCartAmount() === 0) {
+      } else if (getTotalCartAmount() === 0 && searchParams.get("cancelled") !== "true") {
         toast.warn("Your cart is empty.");
         navigate("/cart");
       }
@@ -47,12 +70,20 @@ const PlaceOrder = ({ setShowLogin }) => {
     if (name === "phone") {
       const sanitized = value.replace(/\D/g, "");
       if (sanitized.length <= 10) {
-        setData((prev) => ({ ...prev, phone: sanitized }));
+        setData((prev) => {
+          const updated = { ...prev, phone: sanitized };
+          sessionStorage.setItem("savedDeliveryAddress", JSON.stringify(updated));
+          return updated;
+        });
       }
       return;
     }
 
-    setData((prev) => ({ ...prev, [name]: value }));
+    setData((prev) => {
+      const updated = { ...prev, [name]: value };
+      sessionStorage.setItem("savedDeliveryAddress", JSON.stringify(updated));
+      return updated;
+    });
   };
 
   const placeOrder = async (event) => {
@@ -85,7 +116,7 @@ const PlaceOrder = ({ setShowLogin }) => {
       address: data,
       items: orderItems,
       amount: getTotalCartAmount() + 2,
-      frontend_url: window.location.origin // Dynamically passes http://192.168.x.x or https://tomato-food-frontend.vercel.app
+      frontend_url: window.location.origin
     };
 
     try {
@@ -95,7 +126,8 @@ const PlaceOrder = ({ setShowLogin }) => {
 
       if (response.data.success) {
         const { session_url } = response.data;
-        window.location.replace(session_url);
+        // Use assign so the browser maintains a backward history step
+        window.location.assign(session_url);
       } else {
         toast.error(response.data.message || "Failed to initiate payment.");
       }
