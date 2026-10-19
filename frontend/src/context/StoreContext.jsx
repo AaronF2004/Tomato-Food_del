@@ -9,8 +9,8 @@ const StoreContextProvider = (props) => {
   const [food_list, setFoodList] = useState([]);
   const [token, setToken] = useState("");
   const [searchQuery, setSearchQuery] = useState(""); // Shared search state
-  const url = "http://localhost:4000";
-  //const url = "https://tomato-backend-xfd1.onrender.com";
+  //const url = "http://localhost:4000";
+  const url = "https://tomato-backend-xfdl.onrender.com";
 
   const addToCart = async (itemId) => {
     setCartItems((prev) => {
