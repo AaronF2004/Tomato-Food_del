@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState, useRef } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import "./MyOrders.css";
 import { StoreContext } from "../../context/StoreContext";
 import axios from "axios";
@@ -12,28 +12,6 @@ const MyOrders = ({ setShowLogin }) => {
   const [trackingOrder, setTrackingOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-  const redirectedRef = useRef(false);
-
-  // Anti-Stripe Back-Trap for Mobile & Browser Navigation
-  useEffect(() => {
-    // 1. Push barrier state entries into browser history so back button cannot reach Stripe
-    window.history.pushState({ trap: 1 }, "", window.location.href);
-    window.history.pushState({ trap: 2 }, "", window.location.href);
-
-    const handlePopState = (event) => {
-      if (!redirectedRef.current) {
-        redirectedRef.current = true;
-        // Intercept and route directly to Home page
-        navigate("/", { replace: true });
-      }
-    };
-
-    window.addEventListener("popstate", handlePopState);
-
-    return () => {
-      window.removeEventListener("popstate", handlePopState);
-    };
-  }, [navigate]);
 
   const fetchOrders = async () => {
     try {
@@ -107,10 +85,7 @@ const MyOrders = ({ setShowLogin }) => {
         {/* Home Pill Button */}
         <button
           className="my-orders-home-btn"
-          onClick={() => {
-            redirectedRef.current = true;
-            navigate("/", { replace: true });
-          }}
+          onClick={() => navigate("/", { replace: true })}
           title="Return to Home"
         >
           <svg
@@ -137,10 +112,7 @@ const MyOrders = ({ setShowLogin }) => {
           <button
             className="orders-signin-btn"
             style={{ marginTop: "14px" }}
-            onClick={() => {
-              redirectedRef.current = true;
-              navigate("/", { replace: true });
-            }}
+            onClick={() => navigate("/", { replace: true })}
           >
             Browse Menu
           </button>

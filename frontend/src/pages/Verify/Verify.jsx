@@ -23,15 +23,21 @@ const Verify = () => {
       if (response.data.success) {
         setCartItems({});
         toast.success("Order confirmed successfully!");
-        // Replace current history entry with /myorders
-        navigate("/myorders", { replace: true });
+
+        // 1. Overwrite /verify with Home ('/') in the browser history
+        window.history.replaceState(null, "", "/");
+
+        // 2. Push /myorders on top so Back natively returns to Home ('/')
+        navigate("/myorders");
       } else {
         toast.error("Payment could not be verified or was cancelled.");
-        navigate("/cart", { replace: true });
+        window.history.replaceState(null, "", "/");
+        navigate("/cart");
       }
     } catch (error) {
       toast.error("Error processing order status.");
-      navigate("/cart", { replace: true });
+      window.history.replaceState(null, "", "/");
+      navigate("/cart");
     }
   };
 
