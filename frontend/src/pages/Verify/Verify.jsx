@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useRef } from "react";
 import "./Verify.css";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import { StoreContext } from "../../context/StoreContext";
 import axios from "axios";
 import { toast } from "react-toastify";
@@ -11,7 +11,6 @@ const Verify = () => {
   const success = searchParams.get("success");
   const orderId = searchParams.get("orderId");
   const { url, setCartItems } = useContext(StoreContext);
-  const navigate = useNavigate();
   const hasVerified = useRef(false);
 
   const verifyPayment = async () => {
@@ -24,20 +23,15 @@ const Verify = () => {
         setCartItems({});
         toast.success("Order confirmed successfully!");
 
-        // 1. Overwrite /verify with Home ('/') in the browser history
-        window.history.replaceState(null, "", "/");
-
-        // 2. Push /myorders on top so Back natively returns to Home ('/')
-        navigate("/myorders");
+        // Overwrite the outer browser document session so Stripe is wiped from history
+        window.location.replace("/?fromOrder=true");
       } else {
         toast.error("Payment could not be verified or was cancelled.");
-        window.history.replaceState(null, "", "/");
-        navigate("/cart");
+        window.location.replace("/cart");
       }
     } catch (error) {
       toast.error("Error processing order status.");
-      window.history.replaceState(null, "", "/");
-      navigate("/cart");
+      window.location.replace("/cart");
     }
   };
 
@@ -45,7 +39,7 @@ const Verify = () => {
     if (orderId) {
       verifyPayment();
     } else {
-      navigate("/", { replace: true });
+      window.location.replace("/");
     }
   }, [orderId]);
 

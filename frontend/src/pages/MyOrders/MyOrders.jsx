@@ -85,7 +85,7 @@ const MyOrders = ({ setShowLogin }) => {
         {/* Home Pill Button */}
         <button
           className="my-orders-home-btn"
-          onClick={() => navigate("/", { replace: true })}
+          onClick={() => navigate("/")}
           title="Return to Home"
         >
           <svg
@@ -112,7 +112,7 @@ const MyOrders = ({ setShowLogin }) => {
           <button
             className="orders-signin-btn"
             style={{ marginTop: "14px" }}
-            onClick={() => navigate("/", { replace: true })}
+            onClick={() => navigate("/")}
           >
             Browse Menu
           </button>
