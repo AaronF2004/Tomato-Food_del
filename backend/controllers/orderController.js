@@ -42,9 +42,9 @@ export const placeOrder = async (req, res) => {
     const session = await stripe.checkout.sessions.create({
       line_items: line_items,
       mode: "payment",
-      // When payment succeeds, goes to the confirmation screen
+      // Redirect on success to verification page
       success_url: `${frontend_url}/verify?success=true&orderId=${newOrder._id}`,
-      // When user clicks Back or Cancel on Stripe Checkout, takes them straight back to /order
+      // Redirect directly back to /order delivery form if cancelled or back is pressed
       cancel_url: `${frontend_url}/order?cancelled=true&orderId=${newOrder._id}`
     });
 
@@ -87,6 +87,25 @@ export const userOrders = async (req, res) => {
   }
 };
 
+// Instant Order Cancellation (User/Direct)
+export const cancelOrder = async (req, res) => {
+  const { orderId } = req.body;
+  try {
+    const order = await orderModel.findById(orderId);
+
+    if (!order) {
+      return res.json({ success: false, message: "Order not found" });
+    }
+
+    // Instantly update status to Cancelled
+    await orderModel.findByIdAndUpdate(orderId, { status: "Cancelled" });
+    return res.json({ success: true, message: "Order cancelled successfully" });
+  } catch (error) {
+    console.error("Cancel Order Error:", error);
+    return res.json({ success: false, message: "Error cancelling order" });
+  }
+};
+
 // Listing Orders for Admin Panel
 export const listOrders = async (req, res) => {
   try {
@@ -98,7 +117,7 @@ export const listOrders = async (req, res) => {
   }
 };
 
-// API for updating order status
+// Update order status (Admin)
 export const updateStatus = async (req, res) => {
   try {
     await orderModel.findByIdAndUpdate(req.body.orderId, {

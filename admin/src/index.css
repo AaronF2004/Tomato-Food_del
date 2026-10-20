@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
 
 * {
   padding: 0;
@@ -6,24 +6,26 @@
   box-sizing: border-box;
   font-family: 'Outfit', sans-serif;
 }
+
 body {
   min-height: 100vh;
   background-color: #fcfcfc;
+  color: #1f2937;
+  -webkit-font-smoothing: antialiased;
 }
+
 a {
   text-decoration: none;
   color: inherit;
 }
+
 hr {
   border: none;
   height: 1px;
-  background-color: #a9a9a9;
+  background-color: #f0f0f0;
 }
+
 .app-content {
   display: flex;
-}
-.flex-col {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+  min-height: calc(100vh - 72px);
 }

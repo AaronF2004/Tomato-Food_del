@@ -43,7 +43,6 @@
   border-radius: 12px;
 }
 
-/* Home Return Button */
 .my-orders-home-btn {
   display: inline-flex;
   align-items: center;
@@ -80,7 +79,7 @@
 
 .order-card-row {
   display: grid;
-  grid-template-columns: 2.8fr 1fr 1fr 1.6fr 1.2fr;
+  grid-template-columns: 2.8fr 1fr 1fr 1.4fr 1.4fr;
   align-items: center;
   gap: 18px;
   font-size: 14px;
@@ -122,15 +121,30 @@
   font-size: 13.5px;
 }
 
+.order-status-badge.status-cancelled {
+  color: #dc2626;
+}
+
+.order-status-badge.status-cancelled .status-dot {
+  color: #dc2626;
+}
+
 .status-dot {
   font-size: 12px;
+}
+
+.order-action-buttons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: flex-end;
 }
 
 .track-order-btn {
   border: none;
   background-color: #fef2f2;
   color: #e23744;
-  padding: 9px 16px;
+  padding: 8px 14px;
   border-radius: 8px;
   font-size: 13.5px;
   font-weight: 700;
@@ -143,13 +157,35 @@
   color: #ffffff;
 }
 
+.cancel-order-btn {
+  border: 1px solid #fee2e2;
+  background-color: #fff1f2;
+  color: #dc2626;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cancel-order-btn:hover:not(:disabled) {
+  background-color: #dc2626;
+  color: #ffffff;
+  border-color: #dc2626;
+}
+
+.cancel-order-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .mobile-order-label {
   display: none;
   color: #6b7280;
   font-weight: 500;
 }
 
-/* Unauthenticated / Empty State */
 .my-orders-unauth,
 .my-orders-empty {
   text-align: center;
@@ -186,7 +222,112 @@
   cursor: pointer;
 }
 
-/* Modal Overlay */
+/* Cancel Confirmation Modal */
+.cancel-confirm-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: grid;
+  place-items: center;
+  z-index: 2500;
+  padding: 16px;
+}
+
+.cancel-confirm-card {
+  background: #ffffff;
+  border-radius: 18px;
+  max-width: 420px;
+  width: 100%;
+  padding: 28px 24px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+  animation: modalScale 0.2s ease-out;
+}
+
+@keyframes modalScale {
+  from {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.cancel-icon-circle {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background-color: #fee2e2;
+  margin: 0 auto 16px auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cancel-icon-circle svg {
+  width: 30px;
+  height: 30px;
+}
+
+.cancel-confirm-card h3 {
+  font-size: 19px;
+  font-weight: 800;
+  color: #111827;
+  margin: 0 0 10px 0;
+}
+
+.cancel-confirm-card p {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 0 0 24px 0;
+  line-height: 1.5;
+}
+
+.cancel-modal-buttons {
+  display: flex;
+  gap: 12px;
+}
+
+.cancel-dismiss-btn {
+  flex: 1;
+  background-color: #f3f4f6;
+  color: #374151;
+  border: none;
+  padding: 12px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.cancel-dismiss-btn:hover {
+  background-color: #e5e7eb;
+}
+
+.cancel-confirm-btn {
+  flex: 1.2;
+  background-color: #dc2626;
+  color: #ffffff;
+  border: none;
+  padding: 12px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.cancel-confirm-btn:hover {
+  background-color: #b91c1c;
+}
+
+/* Tracking Modal */
 .track-modal-overlay {
   position: fixed;
   top: 0;
@@ -274,6 +415,15 @@
   color: #e23744;
 }
 
+.step.cancelled .step-circle {
+  background-color: #dc2626;
+  color: #ffffff;
+}
+
+.step.cancelled p {
+  color: #dc2626;
+}
+
 .timeline-line {
   flex: 1;
   height: 2px;
@@ -295,6 +445,11 @@
   margin: 4px 0;
 }
 
+.modal-actions-wrap {
+  display: flex;
+  width: 100%;
+}
+
 .refresh-status-btn {
   width: 100%;
   background-color: #e23744;
@@ -305,9 +460,43 @@
   font-size: 14px;
   font-weight: 700;
   cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-/* Tablet & Mobile Responsiveness */
+.refresh-status-btn:hover:not(:disabled) {
+  background-color: #cb202d;
+}
+
+.refresh-status-btn:disabled {
+  opacity: 0.75;
+  cursor: not-allowed;
+}
+
+.refresh-loading-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.refresh-spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid #ffffff;
+  border-top-color: transparent;
+  border-radius: 50%;
+  display: inline-block;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 @media (max-width: 900px) {
   .order-card-row {
     grid-template-columns: 1fr 1fr;
@@ -334,33 +523,14 @@
     grid-template-columns: 1fr;
   }
 
-  .track-order-btn {
+  .order-action-buttons {
     width: 100%;
+    margin-top: 8px;
   }
-}
 
-.my-orders-back-nav-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  border: 1px solid #e5e7eb;
-  background-color: #ffffff;
-  color: #1f2937;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-}
-
-.my-orders-back-nav-btn:hover {
-  background-color: #f3f4f6;
-  color: #e23744;
-  border-color: #ffd2cc;
-}
-
-.back-icon-svg {
-  width: 18px;
-  height: 18px;
+  .cancel-order-btn,
+  .track-order-btn {
+    flex: 1;
+    text-align: center;
+  }
 }

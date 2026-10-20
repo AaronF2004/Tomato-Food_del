@@ -10,10 +10,13 @@ const MyOrders = ({ setShowLogin }) => {
   const { url, token, authChecked } = useContext(StoreContext);
   const [data, setData] = useState([]);
   const [trackingOrder, setTrackingOrder] = useState(null);
+  const [cancelModalOrder, setCancelModalOrder] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [cancellingId, setCancellingId] = useState(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const navigate = useNavigate();
 
-  // Route mobile back actions to Home
+  // Route mobile/browser back actions to Home
   useEffect(() => {
     window.history.pushState(null, "", window.location.href);
 
@@ -34,13 +37,16 @@ const MyOrders = ({ setShowLogin }) => {
         { headers: { token } }
       );
       if (response.data.success) {
-        setData(response.data.data.reverse());
+        const freshOrders = response.data.data.reverse();
+        setData(freshOrders);
+        return freshOrders;
       }
     } catch (error) {
-      toast.error("Failed to load your orders.");
+      console.error("Orders fetch error:", error);
     } finally {
       setLoading(false);
     }
+    return [];
   };
 
   useEffect(() => {
@@ -57,7 +63,108 @@ const MyOrders = ({ setShowLogin }) => {
     setTrackingOrder(order);
   };
 
+  // Dedicated handler for the Refresh Status button
+  const handleRefreshStatus = async () => {
+    if (!trackingOrder) return;
+    setIsRefreshing(true);
+
+    try {
+      const updatedOrders = await fetchOrders();
+      const latestOrder = updatedOrders.find((o) => o._id === trackingOrder._id);
+
+      if (latestOrder) {
+        setTrackingOrder(latestOrder);
+      }
+
+      toast.info("Order status refreshed", {
+        position: "top-right",
+        autoClose: 1800,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
+    } catch (err) {
+      console.error("Refresh error:", err);
+      toast.error("Failed to refresh status.");
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
+
+  const promptCancelOrder = (order) => {
+    setCancelModalOrder(order);
+  };
+
+  const confirmCancelOrder = async () => {
+    if (!cancelModalOrder) return;
+    const targetOrder = cancelModalOrder;
+    const orderId = targetOrder._id;
+
+    // Immediately dismiss modal from screen
+    setCancelModalOrder(null);
+    setCancellingId(orderId);
+
+    try {
+      let isSuccess = false;
+
+      // Method 1: Try status endpoint
+      try {
+        const statusRes = await axios.post(`${url}/api/order/status`, {
+          orderId: orderId,
+          status: "Cancelled"
+        });
+        if (statusRes.data.success) {
+          isSuccess = true;
+        }
+      } catch (err) {
+        // Fallback to cancel route below
+      }
+
+      // Method 2: Try cancel endpoint
+      if (!isSuccess) {
+        const cancelRes = await axios.post(
+          `${url}/api/order/cancel`,
+          { orderId },
+          { headers: { token } }
+        );
+        if (cancelRes.data.success) {
+          isSuccess = true;
+        }
+      }
+
+      if (isSuccess) {
+        setData((prev) =>
+          prev.map((ord) =>
+            ord._id === orderId ? { ...ord, status: "Cancelled" } : ord
+          )
+        );
+
+        if (trackingOrder && trackingOrder._id === orderId) {
+          setTrackingOrder(null);
+        }
+
+        toast.info("Order cancelled successfully", {
+          position: "top-right",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true
+        });
+      } else {
+        toast.error("Failed to cancel order. Please refresh and try again.");
+      }
+    } catch (error) {
+      console.error("Cancellation error:", error);
+      toast.error("Network issue. Please refresh and try again.");
+    } finally {
+      setCancellingId(null);
+    }
+  };
+
   const getStepClass = (status, step) => {
+    if (status === "Cancelled") return "step cancelled";
     const steps = ["Food Processing", "Out for delivery", "Delivered"];
     const currentIndex = steps.indexOf(status);
     const stepIndex = steps.indexOf(step);
@@ -95,10 +202,10 @@ const MyOrders = ({ setShowLogin }) => {
           </span>
         </div>
 
-        {/* Home Pill Button */}
+        {/* Home Button */}
         <button
           className="my-orders-home-btn"
-          onClick={() => navigate("/", { replace: true })}
+          onClick={() => navigate("/")}
           title="Return to Home"
         >
           <svg
@@ -125,7 +232,7 @@ const MyOrders = ({ setShowLogin }) => {
           <button
             className="orders-signin-btn"
             style={{ marginTop: "14px" }}
-            onClick={() => navigate("/", { replace: true })}
+            onClick={() => navigate("/")}
           >
             Browse Menu
           </button>
@@ -154,16 +261,66 @@ const MyOrders = ({ setShowLogin }) => {
                 {order.items.length}
               </div>
 
-              <div className="order-status-badge">
+              <div className={`order-status-badge ${order.status === "Cancelled" ? "status-cancelled" : ""}`}>
                 <span className="status-dot">&#x25cf;</span>
                 <b>{order.status}</b>
               </div>
 
-              <button className="track-order-btn" onClick={() => handleTrack(order)}>
-                Track Order
-              </button>
+              <div className="order-action-buttons">
+                {order.status !== "Cancelled" && (
+                  <button
+                    className="track-order-btn"
+                    onClick={() => handleTrack(order)}
+                  >
+                    Track
+                  </button>
+                )}
+
+                {order.status === "Food Processing" && (
+                  <button
+                    className="cancel-order-btn"
+                    onClick={() => promptCancelOrder(order)}
+                    disabled={cancellingId === order._id}
+                  >
+                    {cancellingId === order._id ? "Cancelling..." : "Cancel"}
+                  </button>
+                )}
+              </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Styled Confirmation Dialog */}
+      {cancelModalOrder && (
+        <div className="cancel-confirm-overlay" onClick={() => setCancelModalOrder(null)}>
+          <div className="cancel-confirm-card" onClick={(e) => e.stopPropagation()}>
+            <div className="cancel-icon-circle">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#dc2626" strokeWidth="2.5">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="15" y1="9" x2="9" y2="15"></line>
+                <line x1="9" y1="9" x2="15" y2="15"></line>
+              </svg>
+            </div>
+            <h3>Cancel This Order?</h3>
+            <p>
+              Are you sure you want to cancel order <b>#{cancelModalOrder._id.slice(-6).toUpperCase()}</b>? This action cannot be reversed.
+            </p>
+            <div className="cancel-modal-buttons">
+              <button
+                className="cancel-dismiss-btn"
+                onClick={() => setCancelModalOrder(null)}
+              >
+                Keep Order
+              </button>
+              <button
+                className="cancel-confirm-btn"
+                onClick={confirmCancelOrder}
+              >
+                Yes, Cancel Order
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
@@ -200,17 +357,22 @@ const MyOrders = ({ setShowLogin }) => {
               <p><b>Paid Amount:</b> ${trackingOrder.amount}.00</p>
             </div>
 
-            <button
-              className="refresh-status-btn"
-              onClick={async () => {
-                await fetchOrders();
-                const refreshed = data.find((o) => o._id === trackingOrder._id);
-                if (refreshed) setTrackingOrder(refreshed);
-                toast.success("Order status refreshed");
-              }}
-            >
-              Refresh Status
-            </button>
+            {/* Modal Actions: Refresh Status Button */}
+            <div className="modal-actions-wrap">
+              <button
+                className="refresh-status-btn"
+                onClick={handleRefreshStatus}
+                disabled={isRefreshing}
+              >
+                {isRefreshing ? (
+                  <span className="refresh-loading-content">
+                    <span className="refresh-spinner"></span> Refreshing...
+                  </span>
+                ) : (
+                  "Refresh Status"
+                )}
+              </button>
+            </div>
           </div>
         </div>
       )}
