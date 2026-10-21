@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import "./Orders.css";
 import axios from "axios";
 import { toast } from "react-toastify";
@@ -8,20 +8,73 @@ const Orders = ({ url }) => {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("All");
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const [isLiveSyncing, setIsLiveSyncing] = useState(false);
 
-  const fetchAllOrders = async () => {
+  // Store confirmed paid order IDs to detect newly arrived finished orders
+  const knownPaidOrderIdsRef = useRef(new Set());
+  const isInitialLoadRef = useRef(true);
+
+  const fetchAllOrders = async (isBackground = false) => {
+    if (isBackground) setIsLiveSyncing(true);
+
     try {
       const response = await axios.get(`${url}/api/order/list`);
-      if (response.data.success) {
-        setOrders(response.data.data.reverse());
-      } else {
-        toast.error("Failed to load kitchen orders.");
+      if (response.data.success && Array.isArray(response.data.data)) {
+        // Double guarantee: Only take orders where payment is true
+        const confirmedPaidOrders = response.data.data
+          .filter((ord) => ord.payment === true)
+          .reverse();
+
+        // Check for new paid orders after initial page mount
+        if (!isInitialLoadRef.current) {
+          const newlyPaidOrders = confirmedPaidOrders.filter(
+            (ord) => !knownPaidOrderIdsRef.current.has(ord._id)
+          );
+
+          if (newlyPaidOrders.length > 0) {
+            newlyPaidOrders.forEach((o) => {
+              // Notification popup triggers only after Stripe payment finishes
+              toast.info(
+                `🔔 Payment Verified! New Order #${o._id.slice(-6).toUpperCase()} ($${o.amount}.00)`,
+                {
+                  position: "top-right",
+                  autoClose: 4500,
+                  hideProgressBar: false,
+                  closeOnClick: true,
+                  pauseOnHover: true,
+                  draggable: true,
+                }
+              );
+            });
+
+            // Kitchen bell chime
+            try {
+              const audio = new Audio(
+                "https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3"
+              );
+              audio.volume = 0.5;
+              audio.play().catch(() => {});
+            } catch (e) {
+              // Ignore autoplay restrictions
+            }
+          }
+        }
+
+        // Cache paid order IDs
+        knownPaidOrderIdsRef.current = new Set(confirmedPaidOrders.map((o) => o._id));
+        isInitialLoadRef.current = false;
+        setOrders(confirmedPaidOrders);
       }
     } catch (error) {
-      console.error(error);
-      toast.error("Error communicating with backend.");
+      if (!isBackground) {
+        console.error(error);
+        toast.error("Error communicating with backend.");
+      }
     } finally {
       setLoading(false);
+      if (isBackground) {
+        setTimeout(() => setIsLiveSyncing(false), 800);
+      }
     }
   };
 
@@ -50,8 +103,15 @@ const Orders = ({ url }) => {
   };
 
   useEffect(() => {
-    fetchAllOrders();
-  }, []);
+    fetchAllOrders(false);
+
+    // Heartbeat check every 5 seconds for newly confirmed Stripe payments
+    const pollingInterval = setInterval(() => {
+      fetchAllOrders(true);
+    }, 5000);
+
+    return () => clearInterval(pollingInterval);
+  }, [url]);
 
   const filteredOrders =
     filter === "All"
@@ -76,9 +136,18 @@ const Orders = ({ url }) => {
   return (
     <div className="admin-orders-page">
       <div className="admin-orders-header">
-        <div>
-          <h2>Kitchen Orders</h2>
-          <p className="sub-title">Live incoming orders and delivery status</p>
+        <div className="admin-header-title-row">
+          <div>
+            <h2>Kitchen Orders</h2>
+            <p className="sub-title">Live incoming orders and delivery status</p>
+          </div>
+
+          <div className="live-pulse-container" title="Automatically syncing paid orders every 5s">
+            <span className={`live-radar-dot ${isLiveSyncing ? "pulsing" : ""}`}></span>
+            <span className="live-status-text">
+              {isLiveSyncing ? "Verifying payments..." : "Live Auto-Refresh Active"}
+            </span>
+          </div>
         </div>
 
         {/* Status Filter Tabs */}
@@ -173,7 +242,7 @@ const Orders = ({ url }) => {
                 </div>
               </div>
 
-              {/* Status Selector + Quick Inspect Popup Button */}
+              {/* Actions */}
               <div className="order-card-actions">
                 <select
                   value={order.status}
